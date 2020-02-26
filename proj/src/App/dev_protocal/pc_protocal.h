@@ -19,7 +19,7 @@ typedef enum
     DATA_GPS = 4,
     DATA_GYRO = 5,
     DATA_WHEEL = 6,
-    DATA_MGT = 7,
+    DATA_MAGT = 7,
 }DATA_TYPE_e;
 
 /**
@@ -63,6 +63,19 @@ int32_t pc_protocol_initbuffer(uint8_t* buff, uint32_t* size,uint32_t bufflen);
  *******************************************************************************
  */
 int32_t pc_protocol_apendbuffer(uint8_t* buff, uint32_t* size,uint32_t bufflen,void* adddata,uint32_t adddatalen,uint8_t type, uint8_t subtype);
+
+
+/**
+ *******************************************************************************
+ * \fn          int32_t pc_protocol_ackhandle(void)
+ * \brief       PC发过来的帧数据回应处理(返回数据包).
+ * \note        接收到串口数据后调用该函数处理.
+ * \retval      0 成功
+ * \retval      其他值 失败
+ *******************************************************************************
+ */
+int32_t pc_protocol_ackhandle(void);
+
 
 #ifdef __cplusplus
 }

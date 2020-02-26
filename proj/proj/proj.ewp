@@ -2055,6 +2055,12 @@
                 <name>$PROJ_DIR$\..\src\App\dev_protocal\dev_gyro.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\src\App\dev_protocal\dev_magt.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\src\App\dev_protocal\dev_magt.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\src\App\dev_protocal\dev_magtm.c</name>
             </file>
             <file>
@@ -2144,6 +2150,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\src\App\driver_can.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\src\App\driver_spi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\src\App\driver_spi.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\src\App\driver_time.c</name>
@@ -2814,5 +2826,8 @@
     </group>
     <file>
         <name>$PROJ_DIR$\..\README.txt</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\..\..\Doc\硬件使用说明.txt</name>
     </file>
 </project>

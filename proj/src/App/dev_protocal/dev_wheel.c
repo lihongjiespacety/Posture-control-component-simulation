@@ -93,8 +93,8 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
     float speed;
     float toq;
     uint8_t mode;
-    uint32_t topcsize=0;
-    int32_t erro;
+    //uint32_t topcsize=0;
+    //int32_t erro;
     uint8_t sendbufff[40] = {0};
     
     /*接收到遥测命令转发给PC*/
@@ -116,6 +116,8 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
         if(buff[0] == 0x21)
         {
             /*设置最大力矩  将数据通过串口转发到PC*/ 
+            s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
+            memcpy(&(s_wheel_obcdata_at[subtype].toq),&buff[1],4);    /*传过来的是大端 直接大端发送*/
         }
         else if(buff[0] == 0x22)
         {
@@ -123,10 +125,9 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
             memcpy(&(s_wheel_obcdata_at[subtype].speed),&buff[1],4);    /*传过来的是大端 直接大端发送*/
             
-            pc_protocol_initbuffer(sendbufff, &topcsize,sizeof(sendbufff));
-            pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&s_wheel_obcdata_at[subtype],sizeof(WHEEL_Data_t),DATA_WHEEL,subtype);
-            driver_uart_send(HAL_UART_4, sendbufff, topcsize, 10, &erro);
-          
+            ///pc_protocol_initbuffer(sendbufff, &topcsize,sizeof(sendbufff));
+            ///pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&s_wheel_obcdata_at[subtype],sizeof(WHEEL_Data_t),DATA_WHEEL,subtype);
+            ///driver_uart_send(HAL_UART_4, sendbufff, topcsize, 10, &erro);
         }
         else if(buff[0] == 0x23)
         {

@@ -23,9 +23,9 @@ param([String]$debugfile = "");
 
 if ($debugfile -eq "")
 {
-& "E:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\hasee\OneDrive\tianyi\ty-38\Posture-control-component-simulation\proj\proj\settings\proj.Debug.general.xcl" --backend -f "C:\Users\hasee\OneDrive\tianyi\ty-38\Posture-control-component-simulation\proj\proj\settings\proj.Debug.driver.xcl" 
+& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\Administrator\OneDrive\tianyi\ty-38\Posture-control-component-simulation\proj\proj\settings\proj.Debug.general.xcl" --backend -f "C:\Users\Administrator\OneDrive\tianyi\ty-38\Posture-control-component-simulation\proj\proj\settings\proj.Debug.driver.xcl" 
 }
 else
 {
-& "E:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\hasee\OneDrive\tianyi\ty-38\Posture-control-component-simulation\proj\proj\settings\proj.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\hasee\OneDrive\tianyi\ty-38\Posture-control-component-simulation\proj\proj\settings\proj.Debug.driver.xcl" 
+& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\Administrator\OneDrive\tianyi\ty-38\Posture-control-component-simulation\proj\proj\settings\proj.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Administrator\OneDrive\tianyi\ty-38\Posture-control-component-simulation\proj\proj\settings\proj.Debug.driver.xcl" 
 }

@@ -8,6 +8,7 @@
 #include "dev_ssoc.h"
 #include "dev_gyro.h"
 #include "dev_wheel.h"
+#include "dev_magt.h"
 #include "pc_protocal.h"
 #include "common.h"
 
@@ -249,6 +250,7 @@ static int32_t pc_protocol_handle(uint8_t* buff, uint32_t* size)
                             {
                                 case 0:
                                     pc_protocol_handle_data(buff+FRAME_HEAD_SIZE,datalen-FRAME_MINI_SIZE);  /*处理数据帧*/
+                                    pc_protocol_ackhandle(); /*发送返回帧数据*/
                                 break;
                                 case 1:
                                     pc_protocol_handle_cmd(buff+FRAME_HEAD_SIZE,datalen-FRAME_MINI_SIZE);  /*处理命令帧*/
@@ -430,3 +432,38 @@ int32_t pc_protocol_apendbuffer(uint8_t* buff, uint32_t* size,uint32_t bufflen,v
     
     return 0;
 }
+
+/**
+ *******************************************************************************
+ * \fn          int32_t pc_protocol_ackhandle(void)
+ * \brief       PC发过来的帧数据回应处理(返回数据包).
+ * \note        接收到串口数据后调用该函数处理.
+ * \retval      0 成功
+ * \retval      其他值 失败
+ *******************************************************************************
+ */
+int32_t pc_protocol_ackhandle(void)
+{
+    uint8_t sendbufff[128] = {0};
+    uint32_t topcsize=0;
+    int32_t erro;
+    
+    MAGT_Data_t magtdata;
+    WHEEL_Data_t wheeldata;
+    dev_magtdata_get(&magtdata,0,1);
+    pc_protocol_initbuffer(sendbufff, &topcsize,sizeof(sendbufff));
+    pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&magtdata,sizeof(magtdata),DATA_MAGT,0);
+    
+    dev_wheeldata_get(&wheeldata,0);
+    pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&wheeldata,sizeof(WHEEL_Data_t),DATA_WHEEL,0);
+    
+    dev_wheeldata_get(&wheeldata,1);
+    pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&wheeldata,sizeof(WHEEL_Data_t),DATA_WHEEL,1);
+    
+    dev_wheeldata_get(&wheeldata,2);
+    pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&wheeldata,sizeof(WHEEL_Data_t),DATA_WHEEL,2);
+   
+    driver_uart_send(HAL_UART_4, sendbufff, topcsize, 10, &erro);
+    return 0;
+}
+

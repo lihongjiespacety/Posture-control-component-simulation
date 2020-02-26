@@ -38,14 +38,14 @@
 //#define _CAN
 
 /************************************* DMA ************************************/
-//#define _DMA
-//#define _DMA_Channel1
-//#define _DMA_Channel2
-//#define _DMA_Channel3
-//#define _DMA_Channel4
-//#define _DMA_Channel5
-//#define _DMA_Channel6
-//#define _DMA_Channel7
+#define _DMA
+#define _DMA_Channel1
+#define _DMA_Channel2
+#define _DMA_Channel3
+#define _DMA_Channel4
+#define _DMA_Channel5
+#define _DMA_Channel6
+#define _DMA_Channel7
 
 /************************************* EXTI ***********************************/
 #define _EXTI
@@ -59,9 +59,9 @@
 #define _GPIOE
 #define _AFIO
 /************************************* I2C ************************************/
-//#define _I2C
-//#define _I2C1
-//#define _I2C2
+#define _I2C
+#define _I2C1
+#define _I2C2
 
 /************************************* IWDG ***********************************/
 //#define _IWDG
@@ -110,6 +110,18 @@
 
 #ifdef _RCC
 #include "stm32f10x_rcc.h"
+#endif
+
+#ifdef _DMA
+#include "stm32f10x_dma.h"
+#endif
+
+#ifdef _I2C
+#include "stm32f10x_i2c.h"
+#endif
+
+#ifdef _SPI
+#include "stm32f10x_spi.h"
 #endif
 
 /* In the following line adjust the value of External High Speed oscillator (HSE)

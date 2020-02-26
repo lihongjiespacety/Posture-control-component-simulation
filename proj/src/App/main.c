@@ -13,6 +13,15 @@
 #include "can.h"
 #include "pc_protocal.h"
 #include "cantxrxtask.h"
+#include "driver_iic.h"
+#include "I2CRoutines.h"
+#include "dev_magt.h"
+#include "driver_spi.h"
+#include "dev_ssoc.h"
+
+
+#define SPI_TEST 0
+
 
 #define UART_TASK_STACK_SIZE (256 )
 #define UART_TASK_PRIORITY	  ( tskIDLE_PRIORITY + 4 )
@@ -26,7 +35,16 @@
 #define CAN_TXTASK_STACK_SIZE (256 )
 #define CAN_TXTASK_PRIORITY	  ( tskIDLE_PRIORITY + 6 )
 
-
+/* Buffer of data to be received by I2C1 */
+uint8_t Buffer_Rx1[8];
+/* Buffer of data to be transmitted by I2C1 */
+uint8_t Buffer_Tx1[8] = {0x5, 0x6,0x8,0xA};
+/* Buffer of data to be received by I2C2 */
+uint8_t Buffer_Rx2[8];
+/* Buffer of data to be transmitted by I2C2 */
+uint8_t Buffer_Tx2[8] = {0xF, 0xB, 0xC,0xD};
+extern __IO uint8_t Tx_Idx1 , Rx_Idx1;
+extern __IO uint8_t Tx_Idx2 , Rx_Idx2;
 
 extern unsigned  prvRxTask(void* params);
 extern int kiss_set(int argc); 
@@ -44,14 +62,18 @@ uint8_t buff_sum(void* buff,uint8_t len)
   return sum;
 }
 
-uint8_t ver_buff[8]={0x11,0x22,0x33,0x44,0x00,0x00,0x00,0x00};
-uint8_t tm_buff[40]=
-{0x00,0x25,0x33,0x44,0x00,0x00,0x00,0x00};
+
+uint8_t spi_rdbuff[24]={0};
+uint8_t spi_wrbuff1[7]={0x1A,0xCF,0xFC,0x1D,0x04,0x01,0x05};  /*∂¡Ã´√Ù ˝æ›*/
+uint8_t spi_wrbuff2[7]={0x1A,0xCF,0xFC,0x1D,0x03,0x01,0x04};  /*¬À≤®∫ÛµÁ—π*/
+uint8_t spi_wrbuff3[7]={0x1A,0xCF,0xFC,0x1D,0x01,0x01,0x02};  /*Œ¥¬À≤®µÁ—π*/
 
 
 
 static void shelltask( void *pvParameters )
 {
+  MAGT_Data_t magtdata;
+  static uint32_t readtime=0;
   HAL_UART_CFG_t cfg;
   cfg.id = HAL_UART_2;
   cfg.baud = HAL_UART_BAUD_115200;
@@ -68,6 +90,35 @@ static void shelltask( void *pvParameters )
   {
     shell_exec_shellcmd();
     OsTimeDelay(5);
+    
+    if((driver_time_getruntime() - readtime) > 1)
+    {
+        readtime = driver_time_getruntime();
+        dev_magtdata_get(&magtdata,0,0);
+        printf("duty-mx:%d\r\n",magtdata.mx);
+        printf("duty-my:%d\r\n",magtdata.my);
+        printf("duty-mz:%d\r\n",magtdata.mz);
+    }
+#if SPI_TEST
+    driver_spi_trans(spi_wrbuff1,spi_rdbuff,sizeof(spi_wrbuff1));
+    OsTimeDelay(10);
+    memset(spi_rdbuff,0,sizeof(spi_rdbuff));
+    driver_spi_trans(spi_rdbuff,spi_rdbuff,17);  /*∂¡ ˝æ›*/
+    OsTimeDelay(10);
+    
+    driver_spi_trans(spi_wrbuff2,spi_rdbuff,sizeof(spi_wrbuff2));
+    OsTimeDelay(10);
+    memset(spi_rdbuff,0,sizeof(spi_rdbuff));
+    driver_spi_trans(spi_rdbuff,spi_rdbuff,24);  /*∂¡µÁ—π*/
+    OsTimeDelay(10);
+    
+    driver_spi_trans(spi_wrbuff3,spi_rdbuff,sizeof(spi_wrbuff3));
+    OsTimeDelay(10);
+    memset(spi_rdbuff,0,sizeof(spi_rdbuff));
+    driver_spi_trans(spi_rdbuff,spi_rdbuff,24);  /*∂¡µÁ—π*/
+    OsTimeDelay(200);
+#endif
+    
   }
 }
 
@@ -92,6 +143,33 @@ int process_eps_can_request(csp_packet_t* in)
 
 }
 
+/**
+  * @brief  Configures NVIC and Vector Table base location.
+  * @param  None
+  * @retval : None
+  */
+void NVIC_Configuration(void)
+{
+
+    /* 1 bit for pre-emption priority, 3 bits for subpriority */
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
+    NVIC_SetPriority(I2C1_EV_IRQn, 0x00); 
+    NVIC_EnableIRQ(I2C1_EV_IRQn);
+
+    NVIC_SetPriority(I2C1_ER_IRQn, 0x01); 
+    NVIC_EnableIRQ(I2C1_ER_IRQn);
+    
+    
+    NVIC_SetPriority(I2C2_EV_IRQn, 0x00);
+    NVIC_EnableIRQ(I2C2_EV_IRQn);
+
+    NVIC_SetPriority(I2C2_ER_IRQn, 0x01); 
+    NVIC_EnableIRQ(I2C2_ER_IRQn);
+ 
+}
+
+
 
 int main(void)
 { 
@@ -115,6 +193,18 @@ int main(void)
   csp_debug_hook_set(csp_debug_hook);
   driver_time_init();
   driver_can_init(500000);
+  dev_magt_init();
+  //driver_iic_init(1,1,0,0,0);
+  //NVIC_Configuration();
+  //I2C_LowLevel_Init(I2C2);
+  //I2C_LowLevel_Init(I2C1);
+  //I2C_Slave_BufferReadWrite(I2C1, Interrupt);
+#if SPI_TEST
+  driver_spi_init(1,3,200000,0);
+#else
+  driver_spi_init(0,3,200000,dev_ssoc_callback);
+#endif
+  dev_ssoc_init();
   csp_buffer_init(10, PBUF_MTU);
   xTaskCreate( shelltask, "shell", SHELL_TASK_STACK_SIZE, NULL, SHELL_TASK_PRIORITY, NULL );
   xTaskCreate( uarttask, "uart", UART_TASK_STACK_SIZE, NULL, UART_TASK_PRIORITY, NULL );
