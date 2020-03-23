@@ -162,7 +162,7 @@ int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t size)
            
         sendbufff[44] = state;
         sendbufff[56]=buffer_checksum(sendbufff,56);
-        can_tx_raw_data(STAR_SENSOR_CANID,GOM_OBC_CANID,sendbufff,57,CFP_MORE,1,10);
+        can_tx_raw_data(STAR_SENSOR_CANID,GOM_OBC_CANID,sendbufff,57,CFP_BEGIN,1,100);
     }
     else
     {

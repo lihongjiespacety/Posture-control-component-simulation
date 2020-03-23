@@ -225,7 +225,7 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[6] = Num_RC;
             sendbufff[7] = LCmd_ID;
             sendbufff[464] = buffer_checksum(sendbufff,464);
-            can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,465,CFP_MORE,1,10);
+            can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,465,CFP_BEGIN,1,100);
         }
         if((buff[0]==0x00) && (buff[1]==0x01))
         {
@@ -245,7 +245,7 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[9] = m;
             sendbufff[10] = y;
             sendbufff[11] = h;
-            sendbufff[2] = min;
+            sendbufff[12] = min;
             sendbufff[13] = sec;
             buffer_set_uint16(&sendbufff[14],ms);
             
@@ -267,7 +267,7 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             }
             
             sendbufff[86] = buffer_checksum(sendbufff,86);
-            can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,87,CFP_MORE,1,10);
+            can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,87,CFP_BEGIN,1,100);
         }
         else
         {

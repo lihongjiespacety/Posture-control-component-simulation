@@ -187,7 +187,7 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             buffer_set_float(&sendbufff[20],toq);
             
             sendbufff[39]=buffer_checksum(sendbufff,39);
-            can_tx_raw_data(CAN_ID[subtype],GOM_OBC_CANID,sendbufff,40,CFP_MORE,1,10);
+            can_tx_raw_data(CAN_ID[subtype],GOM_OBC_CANID,sendbufff,40,CFP_BEGIN,1,100);
         }
         else
         {

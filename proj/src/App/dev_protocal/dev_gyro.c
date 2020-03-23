@@ -155,7 +155,7 @@ int32_t dev_gyrotel_handle(uint8_t* buff, uint8_t size)
             sendbufff[29] = 0;
             sendbufff[30] = 0;
             sendbufff[31]=buffer_checksum(sendbufff,31);
-            can_tx_raw_data(OPTI_GYRO_CANID,GOM_OBC_CANID,sendbufff,32,CFP_MORE,1,10);
+            can_tx_raw_data(OPTI_GYRO_CANID,GOM_OBC_CANID,sendbufff,32,CFP_BEGIN,1,100);
         }
         else
         {
