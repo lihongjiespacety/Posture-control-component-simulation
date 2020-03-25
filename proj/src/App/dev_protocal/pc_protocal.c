@@ -12,12 +12,12 @@
 #include "pc_protocal.h"
 #include "common.h"
 
-#define READ_BUFF_MAX 32   /*读一次串口大小*/
+#define READ_BUFF_MAX 256   /*读一次串口大小*/
 #define READ_TIMEOUT 200   /*读一次串口超时时间*/
 
 #define FRAME_MINI_SIZE 6   /*一帧数据最小长度*/
 #define FRAME_HEAD_SIZE 5   /*帧头长度*/
-#define FRAME_BUFF_MAX 256  /*帧处理缓冲区大小*/
+#define FRAME_BUFF_MAX 512  /*帧处理缓冲区大小*/
 
 #define HEAD_FLAG1 0xAA
 #define HEAD_FLAG2 0x55
@@ -237,7 +237,7 @@ static int32_t pc_protocol_handle(uint8_t* buff, uint32_t* size)
             if(*size > FRAME_MINI_SIZE)
             {
                 datalen = ((uint16_t)buff[2]<<8) | (uint16_t)buff[3];  /*长度*/
-                if(datalen<=FRAME_BUFF_MAX)
+                if((datalen<=FRAME_BUFF_MAX) && (datalen>=FRAME_MINI_SIZE))
                 {
                     if(*size >= datalen)
                     {

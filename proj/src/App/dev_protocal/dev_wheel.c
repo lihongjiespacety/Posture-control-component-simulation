@@ -71,7 +71,7 @@ int32_t dev_wheeldata_get(WHEEL_Data_t* buff,uint8_t subtype)
     }
     else
     {
-        memcpy(buff,&s_wheel_data_at[subtype],sizeof(WHEEL_Data_t));
+        memcpy(buff,&s_wheel_obcdata_at[subtype],sizeof(WHEEL_Data_t));
         return 0;
     }
 }

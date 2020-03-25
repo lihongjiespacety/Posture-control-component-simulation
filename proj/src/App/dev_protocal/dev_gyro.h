@@ -5,7 +5,7 @@
  extern "C" {
 #endif
    
-#define GYRO_NUM 1 /*定义陀螺的个数*/
+#define GYRO_NUM 2 /*定义陀螺的个数*/
 /**
  * \enum GYRO_Data_t
  * 陀螺子块内容.

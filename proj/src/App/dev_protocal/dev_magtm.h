@@ -5,7 +5,7 @@
  extern "C" {
 #endif
    
-#define MAGTM_NUM 1 /*定义磁强计的个数*/
+#define MAGTM_NUM 2 /*定义磁强计的个数*/
 /**
  * \enum MAGTM_Data_t
  * 磁强计子块内容.
