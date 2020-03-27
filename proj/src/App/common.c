@@ -39,7 +39,7 @@ uint32_t buffer_get_uint32(uint8_t* buff)
  */
 int16_t buffer_get_int16(uint8_t* buff)
 {
-    return ((uint16_t)buff[0]<<8) | ((uint16_t)buff[1]<<9);
+    return ((uint16_t)buff[0]<<8) | ((uint16_t)buff[1]<<0);
 }
 
 /**
@@ -53,7 +53,7 @@ int16_t buffer_get_int16(uint8_t* buff)
  */
 uint16_t buffer_get_uint16(uint8_t* buff)
 {
-    return ((uint16_t)buff[0]<<8) | ((uint16_t)buff[1]<<9);
+    return ((uint16_t)buff[0]<<8) | ((uint16_t)buff[1]<<0);
 }
 
 /**

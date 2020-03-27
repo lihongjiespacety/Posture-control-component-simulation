@@ -85,11 +85,11 @@ int32_t dev_ssocdata_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             __disable_interrupt();  /*保证读三轴数据是同时更新的*/
 //          s_ssoc_data_at[subtype].erfa  = buffer_get_int32(&buff[0]);
 //          s_ssoc_data_at[subtype].beta  = buffer_get_int32(&buff[4]);
-//          s_ssoc_data_at[subtype].sta   = buff[5];
-//          s_ssoc_data_at[subtype].cell1 = buffer_get_int32(&buff[6]);
-//          s_ssoc_data_at[subtype].cell2 = buffer_get_int32(&buff[10]);
-//          s_ssoc_data_at[subtype].cell3 = buffer_get_int32(&buff[14]);
-//          s_ssoc_data_at[subtype].cell4 = buffer_get_int32(&buff[18]);
+//          s_ssoc_data_at[subtype].sta   = buff[8];
+//          s_ssoc_data_at[subtype].cell1 = buffer_get_int32(&buff[9]);
+//          s_ssoc_data_at[subtype].cell2 = buffer_get_int32(&buff[13]);
+//          s_ssoc_data_at[subtype].cell3 = buffer_get_int32(&buff[17]);
+//          s_ssoc_data_at[subtype].cell4 = buffer_get_int32(&buff[21]);
             
             /*数据更新到发送区*/
 //          buffer_set_float(&g_tx_data_buff[7],s_ssoc_data_at[subtype].erfa);

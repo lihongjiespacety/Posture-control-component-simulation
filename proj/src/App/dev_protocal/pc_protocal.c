@@ -463,6 +463,8 @@ int32_t pc_protocol_ackhandle(void)
     dev_wheeldata_get(&wheeldata,2);
     pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&wheeldata,sizeof(WHEEL_Data_t),DATA_WHEEL,2);
    
+    dev_wheeldata_get(&wheeldata,3);
+    pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&wheeldata,sizeof(WHEEL_Data_t),DATA_WHEEL,3);
     driver_uart_send(HAL_UART_4, sendbufff, topcsize, 10, &erro);
     return 0;
 }
