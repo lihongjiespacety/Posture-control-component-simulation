@@ -247,8 +247,11 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[11] = h;
             sendbufff[12] = min;
             sendbufff[13] = sec;
-            buffer_set_uint16(&sendbufff[14],ms);
+           // buffer_set_uint16(&sendbufff[14],ms);
+            sendbufff[14] = ms & 0xFF;  /*Ð¡¶Ë*/
+            sendbufff[15] = ms >> 8;
             
+            sendbufff[16] = 0xAA;
             buffer_set_uint32(&sendbufff[24],x_position);
             buffer_set_uint32(&sendbufff[28],y_position);
             buffer_set_uint32(&sendbufff[32],z_position);
@@ -256,14 +259,23 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             buffer_set_uint32(&sendbufff[40],y_speed);
             buffer_set_uint32(&sendbufff[44],z_speed);
             
+            buffer_set_uint32(&sendbufff[48],x_position);
+            buffer_set_uint32(&sendbufff[52],y_position);
+            buffer_set_uint32(&sendbufff[56],z_position);
+            buffer_set_uint32(&sendbufff[60],x_speed);
+            buffer_set_uint32(&sendbufff[64],y_speed);
+            buffer_set_uint32(&sendbufff[68],z_speed);
+            
             /*¶¨¹ìÔÊÐí×´Ì¬*/
             if(Gps_State)
             {
-                sendbufff[81] |= (1<<4);
+                
+                sendbufff[81] &= ~(1<<4);
+                sendbufff[81] |= 0x82;
             }
             else
             {
-                sendbufff[81] &= ~(1<<4);
+                sendbufff[81] |= (1<<4);
             }
             
             sendbufff[86] = buffer_checksum(sendbufff,86);
