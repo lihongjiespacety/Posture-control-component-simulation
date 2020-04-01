@@ -138,7 +138,8 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
         else if(buff[0] == 0x24)
         {
             /*设置net力矩*/
-
+            s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
+            memcpy(&(s_wheel_obcdata_at[subtype].toq),&buff[1],4);    /*传过来的是大端 直接大端发送*/
           
         }
         else if(buff[0] == 0xFE)
