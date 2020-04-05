@@ -13,7 +13,7 @@
 #include "common.h"
 
 #define READ_BUFF_MAX 256   /*读一次串口大小*/
-#define READ_TIMEOUT 200   /*读一次串口超时时间*/
+#define READ_TIMEOUT 30   /*读一次串口超时时间*/
 
 #define FRAME_MINI_SIZE 6   /*一帧数据最小长度*/
 #define FRAME_HEAD_SIZE 5   /*帧头长度*/

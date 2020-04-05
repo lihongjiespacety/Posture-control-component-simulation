@@ -11,6 +11,8 @@ WHEEL_Data_t s_wheel_data_at[WHEEL_NUM];     /*记录PC发过来的数据*/
 WHEEL_Data_t s_wheel_obcdata_at[WHEEL_NUM];  /*记录OBC发过来的反馈数据*/
 
 static uint8_t Num_T[4] =  {0};    /*遥测正确帧计数*/
+static uint8_t SetNetNum_T[4] =  {0};   
+static uint8_t SetSpeedNum_T[4] =  {0};   
 static uint8_t LCmd_ID[4] =  {0};  /*最近执行指令吗*/
 static uint8_t Num_RC[4] =  {0};  /*错误帧计数*/
 static uint8_t CAN_ID[4] =  {WHEEL_X_CANID,WHEEL_Y_CANID,WHEEL_Z_CANID,WHEEL_A_CANID};   /*ID*/
@@ -124,7 +126,7 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             /*设置速度*/
             s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
             memcpy(&(s_wheel_obcdata_at[subtype].speed),&buff[1],4);    /*传过来的是大端 直接大端发送*/
-            
+            SetSpeedNum_T[subtype]++;
             ///pc_protocol_initbuffer(sendbufff, &topcsize,sizeof(sendbufff));
             ///pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&s_wheel_obcdata_at[subtype],sizeof(WHEEL_Data_t),DATA_WHEEL,subtype);
             ///driver_uart_send(HAL_UART_4, sendbufff, topcsize, 10, &erro);
@@ -140,6 +142,7 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             /*设置net力矩*/
             s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
             memcpy(&(s_wheel_obcdata_at[subtype].toq),&buff[1],4);    /*传过来的是大端 直接大端发送*/
+            SetNetNum_T[subtype]++;
           
         }
         else if(buff[0] == 0xFE)
@@ -179,10 +182,10 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             
             sendbufff[0] = 0x00;
             sendbufff[1] = 0x25;
-            sendbufff[2] = Num_T[3];
-            sendbufff[3] = 0;
-            sendbufff[4] = Num_RC[3];
-            sendbufff[5] = 0;
+            sendbufff[2] = Num_T[subtype];
+            sendbufff[3] = SetNetNum_T[subtype];
+            sendbufff[4] = Num_RC[subtype];
+            sendbufff[5] = SetSpeedNum_T[subtype];
             sendbufff[6] = mode;
             buffer_set_float(&sendbufff[16],speed);
             buffer_set_float(&sendbufff[20],toq);
@@ -192,7 +195,7 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
         }
         else
         {
-            Num_RC[subtype]++;
+            //Num_RC[subtype]++;
         }
     }
     else

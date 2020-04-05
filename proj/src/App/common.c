@@ -67,7 +67,14 @@ uint16_t buffer_get_uint16(uint8_t* buff)
  */
 float buffer_get_float(uint8_t* buff)
 {
-    return ((uint32_t)buff[0]<<24) | ((uint32_t)buff[1]<<16) | ((uint32_t)buff[2]<<8) | ((uint32_t)buff[3]<<0);
+    float tmp;
+    uint8_t* p;
+    p = (uint8_t*)&tmp;
+    p[0] = buff[3];
+    p[1] = buff[2];
+    p[2] = buff[1];
+    p[3] = buff[0];
+    return tmp;
 }
 
 /**
@@ -151,10 +158,13 @@ void buffer_set_uint32(uint8_t* buff,uint32_t val)
  */
 void buffer_set_float(uint8_t* buff,float val)
 {
-    buff[0] = (uint8_t)((uint32_t)val>>24);
-    buff[1] = (uint8_t)((uint32_t)val>>16);
-    buff[2] = (uint8_t)((uint32_t)val>>8);
-    buff[3] = (uint8_t)((uint32_t)val>>0);
+    float tmp = val;
+    uint8_t* p;
+    p = (uint8_t*)&tmp;
+    buff[0] = *(p+3);
+    buff[1] = *(p+2);
+    buff[2] = *(p+1);
+    buff[3] = *(p+0);
 }
 
 /**
