@@ -4,6 +4,8 @@
 #include "osapi_freertos.h"
 #include "dev_starsensor.h"
 #include "can.h"
+#include "obc_protocal.h"
+#include "pc_protocal.h"
 
 STARSENSOR_Data_t s_starsensor_data_at[STARSENSOR_NUM];  /*记录PC发过来的数据*/
 
@@ -162,7 +164,10 @@ int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t size)
            
         sendbufff[38] = state;
         sendbufff[56]=buffer_checksum(sendbufff,56);
+        if((get_dev_state() & (1<< DATA_STARSENSOR))== 0)
+        {
         can_tx_raw_data(STAR_SENSOR_CANID,GOM_OBC_CANID,sendbufff,57,CFP_BEGIN,1,100);
+    }
     }
     else
     {

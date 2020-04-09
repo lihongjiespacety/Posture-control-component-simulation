@@ -6,6 +6,8 @@
 #include "can.h"
 #include "pc_protocal.h"
 #include "driver_uart.h"
+#include "obc_protocal.h"
+#include "pc_protocal.h"
 
 WHEEL_Data_t s_wheel_data_at[WHEEL_NUM];     /*记录PC发过来的数据*/
 WHEEL_Data_t s_wheel_obcdata_at[WHEEL_NUM];  /*记录OBC发过来的反馈数据*/
@@ -170,8 +172,10 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             sendbufff[5] = 0x44;
             sendbufff[6] = 0;
             sendbufff[7] = 0;
-
+            if((get_dev_state() & (1<< DATA_WHEEL))== 0)
+            {
             can_tx_raw_data(CAN_ID[subtype],GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+            }
           
         }
         else if(buff[0] == 0x20)
@@ -191,7 +195,10 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             buffer_set_float(&sendbufff[20],toq);
             
             sendbufff[39]=buffer_checksum(sendbufff,39);
+            if((get_dev_state() & (1<< DATA_WHEEL))== 0)
+            {
             can_tx_raw_data(CAN_ID[subtype],GOM_OBC_CANID,sendbufff,40,CFP_BEGIN,1,100);
+        }
         }
         else
         {

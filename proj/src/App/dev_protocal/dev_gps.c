@@ -7,6 +7,8 @@
 #include "can.h"
 #include "clock.h"
 #include "driver_time.h"
+#include "obc_protocal.h"
+#include "pc_protocal.h"
 
 GPS_Data_t s_gps_data_at[GPS_NUM];  /*记录PC发过来的数据*/
 
@@ -180,7 +182,10 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[5] = 0x55;
             sendbufff[6] = 0x55;
             sendbufff[7] = 0x55;
+            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            {
             can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+        }
         }
         if((buff[0]==0x05) && (buff[1]==0x02))
         {
@@ -195,7 +200,10 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[5] = 0x55;
             sendbufff[6] = 0x55;
             sendbufff[7] = 0x55;
+            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            {
             can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+        }
         }
         if((buff[0]==0x05) && (buff[1]==0x01))
         {
@@ -210,11 +218,15 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[5] = 0x55;
             sendbufff[6] = 0x55;
             sendbufff[7] = 0x55;
+            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            {
             can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+        }
         }
         if((buff[0]==0x00) && (buff[1]==0x02))
         {
             Num_T++;
+            Num_C++;
             LCmd_ID = 0;
             sendbufff[0] = 0x01;
             sendbufff[1] = 0xCE;
@@ -225,13 +237,16 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[6] = Num_RC;
             sendbufff[7] = LCmd_ID;
             sendbufff[464] = buffer_checksum(sendbufff,464);
+            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            {
             can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,465,CFP_BEGIN,1,100);
+        }
         }
         if((buff[0]==0x00) && (buff[1]==0x01))
         {
             Num_T++;
             LCmd_ID = 0;
-            
+            Num_C++;
             sendbufff[0] = 0x00;
             sendbufff[1] = 0x54;
             sendbufff[2] = 0x35;
@@ -279,7 +294,10 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             }
             
             sendbufff[86] = buffer_checksum(sendbufff,86);
+            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            {
             can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,87,CFP_BEGIN,1,100);
+        }
         }
         else
         {

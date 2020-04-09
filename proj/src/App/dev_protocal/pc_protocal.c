@@ -27,6 +27,9 @@ static uint8_t s_framebuff_au8[FRAME_BUFF_MAX];   /*帧处理缓冲区*/
 static uint32_t s_framebuff_size=0;              /*帧缓冲区中数据长度*/
 
 
+static uint8_t s_dev_state_u8 = 0;              /*设备是否静默的状态 1静默 0不静默*/
+
+
 /**
  *  模拟数据帧                 磁强计  10001nT 10002nT 10003nT              星敏  (0i+0j+0k,1)   10000S  2mS                                                                                           太敏  (0i+0j+0k,1)   10000S  2mS
  *  数据帧      AA 55 00 9D 00 0F 01 00 00 00 27 11 00 00 27 12 00 00 27 13 29 02 00 00 00 00 00 00 00 00 00 00 00 00 00 7F FF FF FF 00 00 27 11 00 00 00 31 00 00 00 00 00 00 00 00 00 00 00 00 00 00 1C 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -169,7 +172,21 @@ static int32_t pc_protocol_handle_cmd(uint8_t* buff, uint32_t size)
                 /*有效数据长度 处理数据*/
                 switch(buff[1])
                 {
-                    case 0:
+                    case 0:  /*静默指令*/
+                      if(buff[2] == 0)
+                      {
+                          s_dev_state_u8 = buff[3];
+                      }
+                      else if(buff[2] == 1)
+                      {
+                          s_dev_state_u8 |= buff[3];
+                      }
+                      else if(buff[2] == 2)
+                      {
+                          s_dev_state_u8 &= ~buff[3];
+                      }
+                      else
+                      {}
                     break;
                     case 1:
                     break;
@@ -469,3 +486,16 @@ int32_t pc_protocol_ackhandle(void)
     return 0;
 }
 
+
+/**
+ *******************************************************************************
+ * \fn          uint8_t get_dev_state(void)
+ * \brief       获取设备静默状态.
+ * \note        .
+ * \return      uint8_t 状态值
+ *******************************************************************************
+ */
+uint8_t get_dev_state(void)
+{
+    return s_dev_state_u8;
+}

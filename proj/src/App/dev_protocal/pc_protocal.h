@@ -76,6 +76,16 @@ int32_t pc_protocol_apendbuffer(uint8_t* buff, uint32_t* size,uint32_t bufflen,v
  */
 int32_t pc_protocol_ackhandle(void);
 
+/**
+ *******************************************************************************
+ * \fn          uint8_t get_dev_state(void)
+ * \brief       获取设备静默状态.
+ * \note        .
+ * \return      uint8_t 状态值
+ *******************************************************************************
+ */
+uint8_t get_dev_state(void);
+
 
 #ifdef __cplusplus
 }

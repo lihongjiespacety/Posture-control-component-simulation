@@ -6,6 +6,8 @@
 #include "dev_gyro.h"
 #include "can.h"
 #include "clock.h"
+#include "obc_protocal.h"
+#include "pc_protocal.h"
 
 GYRO_Data_t s_gyro_data_at[GYRO_NUM];  /*记录PC发过来的数据*/
 static uint8_t Num_C = 0;    /*正确帧计数*/
@@ -155,7 +157,10 @@ int32_t dev_gyrotel_handle(uint8_t* buff, uint8_t size)
             sendbufff[29] = 0;
             sendbufff[30] = 0;
             sendbufff[31]=buffer_checksum(sendbufff,31);
+            if((get_dev_state() & (1<< DATA_GYRO))== 0)
+            {
             can_tx_raw_data(OPTI_GYRO_CANID,GOM_OBC_CANID,sendbufff,32,CFP_BEGIN,1,100);
+        }
         }
         else
         {
@@ -175,7 +180,10 @@ int32_t dev_gyrotel_handle(uint8_t* buff, uint8_t size)
             sendbufff[5] = 0x55;
             sendbufff[6] = 0x55;
             sendbufff[7] = 0x55;
+            if((get_dev_state() & (1<< DATA_GYRO))== 0)
+            {
             can_tx_raw_data(OPTI_GYRO_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+            }
             
         }
     }
