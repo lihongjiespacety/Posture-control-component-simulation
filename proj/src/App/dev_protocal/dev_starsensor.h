@@ -56,16 +56,18 @@ int32_t dev_starsensordata_get(STARSENSOR_Data_t* buff,uint8_t subtype);
 
 /**
  *******************************************************************************
- * \fn          int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t size)
+ * \fn          int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
  * \brief       处理星敏遥测请求.
  * \note        处理星敏遥测请求.
  * \param[in]   buff     数据.
+ * \param[in]   subtype  一般多个同类型设备代表设备序号.
  * \param[in]   size     数据内容长度.
  * \retval      0 成功
  * \retval      其他值 失败
  *******************************************************************************
  */
-int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t size);
+int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t subtype, uint8_t size);
+
 
 #ifdef __cplusplus
 }

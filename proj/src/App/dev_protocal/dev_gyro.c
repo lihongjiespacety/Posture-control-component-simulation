@@ -157,10 +157,10 @@ int32_t dev_gyrotel_handle(uint8_t* buff, uint8_t size)
             sendbufff[29] = 0;
             sendbufff[30] = 0;
             sendbufff[31]=buffer_checksum(sendbufff,31);
-            if((get_dev_state() & (1<< DATA_GYRO))== 0)
+            if((get_dev_state() & (1<< DEV_NUM_GYRO1))== 0)
             {
-            can_tx_raw_data(OPTI_GYRO_CANID,GOM_OBC_CANID,sendbufff,32,CFP_BEGIN,1,100);
-        }
+              can_tx_raw_data(OPTI_GYRO_CANID,GOM_OBC_CANID,sendbufff,32,CFP_BEGIN,1,100);
+            }
         }
         else
         {
@@ -180,9 +180,9 @@ int32_t dev_gyrotel_handle(uint8_t* buff, uint8_t size)
             sendbufff[5] = 0x55;
             sendbufff[6] = 0x55;
             sendbufff[7] = 0x55;
-            if((get_dev_state() & (1<< DATA_GYRO))== 0)
+            if((get_dev_state() & (1<< DEV_NUM_GYRO1))== 0)
             {
-            can_tx_raw_data(OPTI_GYRO_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+              can_tx_raw_data(OPTI_GYRO_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
             }
             
         }

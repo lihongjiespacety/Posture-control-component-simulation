@@ -69,7 +69,13 @@ int32_t obc_protocol_handle_data(uint8_t canid, uint8_t* buff, uint32_t size)
             dev_wheeltel_handle(p,3,size);
         break;
         case STAR_SENSOR_CANID:
-            dev_starsensortel_handle(p,size);
+            dev_starsensortel_handle(p,0,size);
+        break;
+        case STAR_SENSOR2_CANID:
+            dev_starsensortel_handle(p,1,size);
+        break;
+        case STAR_SENSOR3_CANID:
+            dev_starsensortel_handle(p,2,size);
         break;
         case OPTI_GYRO_CANID:
             dev_gyrotel_handle(p,size);

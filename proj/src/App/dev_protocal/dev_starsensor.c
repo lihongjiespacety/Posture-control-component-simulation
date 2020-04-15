@@ -86,16 +86,17 @@ int32_t dev_starsensordata_get(STARSENSOR_Data_t* buff,uint8_t subtype)
 
 /**
  *******************************************************************************
- * \fn          int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t size)
+ * \fn          int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
  * \brief       处理星敏遥测请求.
  * \note        处理星敏遥测请求.
  * \param[in]   buff     数据.
+ * \param[in]   subtype  一般多个同类型设备代表设备序号.
  * \param[in]   size     数据内容长度.
  * \retval      0 成功
  * \retval      其他值 失败
  *******************************************************************************
  */
-int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t size)
+int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
 {
      uint8_t sendbufff[57] = {0};
      int32_t q1;
@@ -110,17 +111,17 @@ int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t size)
      int32_t y_speed;
      int32_t z_speed;
     __disable_interrupt();      /*保证读数据是同时更新的*/    
-    q1 =  s_starsensor_data_at[0].i;
-    q2 =  s_starsensor_data_at[0].j;
-    q3 =  s_starsensor_data_at[0].k;
-    q4 =  s_starsensor_data_at[0].q;
-    sec = s_starsensor_data_at[0].sec;
-    us = s_starsensor_data_at[0].us;
-    x_speed = s_starsensor_data_at[0].x_speed;
-    y_speed = s_starsensor_data_at[0].y_speed;
-    z_speed = s_starsensor_data_at[0].z_speed;
-    exposure = s_starsensor_data_at[0].exposure;
-    state = s_starsensor_data_at[0].state;
+    q1 =  s_starsensor_data_at[subtype].i;
+    q2 =  s_starsensor_data_at[subtype].j;
+    q3 =  s_starsensor_data_at[subtype].k;
+    q4 =  s_starsensor_data_at[subtype].q;
+    sec = s_starsensor_data_at[subtype].sec;
+    us = s_starsensor_data_at[subtype].us;
+    x_speed = s_starsensor_data_at[subtype].x_speed;
+    y_speed = s_starsensor_data_at[subtype].y_speed;
+    z_speed = s_starsensor_data_at[subtype].z_speed;
+    exposure = s_starsensor_data_at[subtype].exposure;
+    state = s_starsensor_data_at[subtype].state;
     __enable_interrupt(); 
     
     /*接收到遥测命令转发给PC*/
@@ -164,10 +165,21 @@ int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t size)
            
         sendbufff[38] = state;
         sendbufff[56]=buffer_checksum(sendbufff,56);
-        if((get_dev_state() & (1<< DATA_STARSENSOR))== 0)
+        if((get_dev_state() & ((uint32_t)1<< (DEV_NUM_STARSENSOR1+subtype)))== 0)
         {
-        can_tx_raw_data(STAR_SENSOR_CANID,GOM_OBC_CANID,sendbufff,57,CFP_BEGIN,1,100);
-    }
+          if(subtype==0)
+          {
+            can_tx_raw_data(STAR_SENSOR_CANID,GOM_OBC_CANID,sendbufff,57,CFP_BEGIN,1,100);
+          }
+          else if(subtype==1)
+          {
+            can_tx_raw_data(STAR_SENSOR2_CANID,GOM_OBC_CANID,sendbufff,57,CFP_BEGIN,1,100);
+          }
+          else if(subtype==2)
+          {
+            can_tx_raw_data(STAR_SENSOR3_CANID,GOM_OBC_CANID,sendbufff,57,CFP_BEGIN,1,100);
+          }
+        }
     }
     else
     {

@@ -107,27 +107,27 @@ int32_t dev_magtmtel_handle(uint8_t* buff, uint8_t size)
         sendbufff[0] = 0xBB;
         buffer_set_int32(&sendbufff[1],mx);  /*非pack 32位读写mx是原子操作 这里不再做临界段保护*/
         sendbufff[5] = buffer_checksum(sendbufff,5);
-        if((get_dev_state() & (1<< DATA_MAGTM))== 0)
+        if((get_dev_state() & (1<< DEV_NUM_MAGTM1))== 0)
         {
-        can_tx_raw_data(EXT_MAGTM_CANID,GOM_OBC_CANID,sendbufff,6,CFP_SINGLE,1,10);
+          can_tx_raw_data(EXT_MAGTM_CANID,GOM_OBC_CANID,sendbufff,6,CFP_SINGLE,1,10);
         }
     
         /*Y轴*/
         sendbufff[0] = 0xCC;
         buffer_set_int32(&sendbufff[1],my);
         sendbufff[5] = buffer_checksum(sendbufff,5);
-        if((get_dev_state() & (1<< DATA_MAGTM))== 0)
+        if((get_dev_state() & (1<< DEV_NUM_MAGTM1))== 0)
         {
-        can_tx_raw_data(EXT_MAGTM_CANID,GOM_OBC_CANID,sendbufff,6,CFP_SINGLE,1,10);
+          can_tx_raw_data(EXT_MAGTM_CANID,GOM_OBC_CANID,sendbufff,6,CFP_SINGLE,1,10);
         }
         /*Z轴*/
         sendbufff[0] = 0xDD;
         buffer_set_int32(&sendbufff[1],mz);
         sendbufff[5] = buffer_checksum(sendbufff,5);
-        if((get_dev_state() & (1<< DATA_MAGTM))== 0)
+        if((get_dev_state() & (1<< DEV_NUM_MAGTM1))== 0)
         {
-        can_tx_raw_data(EXT_MAGTM_CANID,GOM_OBC_CANID,sendbufff,6,CFP_SINGLE,1,10);
-    }
+          can_tx_raw_data(EXT_MAGTM_CANID,GOM_OBC_CANID,sendbufff,6,CFP_SINGLE,1,10);
+        }
     }
     else
     {

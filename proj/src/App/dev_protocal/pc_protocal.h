@@ -23,6 +23,42 @@ typedef enum
 }DATA_TYPE_e;
 
 /**
+ * \enum DEV_NUM_e
+ * 设备编号枚举.
+ */
+typedef enum
+{
+    DEV_NUM_MAGTM1 = 0,
+    DEV_NUM_MAGTM2,
+    DEV_NUM_MAGTM3,
+    DEV_NUM_MAGTM4,
+    DEV_NUM_STARSENSOR1,
+    DEV_NUM_STARSENSOR2,
+    DEV_NUM_STARSENSOR3,
+    DEV_NUM_STARSENSOR4,
+    DEV_NUM_SSOC1,
+    DEV_NUM_SSOC2,
+    DEV_NUM_SSOC3,
+    DEV_NUM_SSOC4,
+    DEV_NUM_GPS1,
+    DEV_NUM_GPS2,
+    DEV_NUM_GPS3,
+    DEV_NUM_GPS4,
+    DEV_NUM_GYRO1,
+    DEV_NUM_GYRO2,
+    DEV_NUM_GYRO3,
+    DEV_NUM_GYRO4,
+    DEV_NUM_WHEEL1,
+    DEV_NUM_WHEEL2,
+    DEV_NUM_WHEEL3,
+    DEV_NUM_WHEEL4,
+    DEV_NUM_MAGT1,
+    DEV_NUM_MAGT2,
+    DEV_NUM_MAGT3,
+    DEV_NUM_MAGT4,
+}DEV_NUM_e;
+
+/**
  * \enum CMD_TYPE_e
  * 命令帧子块类型.
  */
@@ -78,13 +114,13 @@ int32_t pc_protocol_ackhandle(void);
 
 /**
  *******************************************************************************
- * \fn          uint8_t get_dev_state(void)
+ * \fn          uint32_t get_dev_state(void)
  * \brief       获取设备静默状态.
  * \note        .
- * \return      uint8_t 状态值
+ * \return      uint32_t 状态值
  *******************************************************************************
  */
-uint8_t get_dev_state(void);
+uint32_t get_dev_state(void);
 
 
 #ifdef __cplusplus

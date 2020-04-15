@@ -71,7 +71,7 @@ int32_t dev_gpsdata_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             //t_st.tm_yday;                                    /* Days in year.[0-365] */
             t = driver_time_mktime_r(&t_st);
             ts.tv_sec = t;
-            ts.tv_usec = s_gps_data_at[subtype].msec*1000;
+            ts.tv_usec = (uint32_t)s_gps_data_at[subtype].msec*1000;
             clock_set_time(&ts);
             OsPrintf(OSAPI_DEBUG_INFO,"get gpsdata\r\n");
             return 0;
@@ -142,6 +142,7 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
     clock_get_time(&ts);
     
     driver_time_localtime_r(&ts.tv_sec, &t_st);
+    __disable_interrupt();      /*保证读三轴数据是同时更新的*/  
     y = t_st.tm_year-100;
     m = t_st.tm_mon +1;
     d = t_st.tm_mday;
@@ -150,7 +151,7 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
     sec = t_st.tm_sec;
     ms = (ts.tv_usec+500)/1000;
     
-    __disable_interrupt();      /*保证读三轴数据是同时更新的*/    
+    ///__disable_interrupt();      /*保证读三轴数据是同时更新的*/    
     x_speed =  s_gps_data_at[0].x_speed;
     y_speed =  s_gps_data_at[0].y_speed;
     z_speed =  s_gps_data_at[0].z_speed;
@@ -182,10 +183,10 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[5] = 0x55;
             sendbufff[6] = 0x55;
             sendbufff[7] = 0x55;
-            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            if((get_dev_state() & (1<< DEV_NUM_GPS1))== 0)
             {
-            can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
-        }
+              can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+            }
         }
         if((buff[0]==0x05) && (buff[1]==0x02))
         {
@@ -200,10 +201,10 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[5] = 0x55;
             sendbufff[6] = 0x55;
             sendbufff[7] = 0x55;
-            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            if((get_dev_state() & (1<< DEV_NUM_GPS1))== 0)
             {
-            can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
-        }
+              can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+            }
         }
         if((buff[0]==0x05) && (buff[1]==0x01))
         {
@@ -218,10 +219,10 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[5] = 0x55;
             sendbufff[6] = 0x55;
             sendbufff[7] = 0x55;
-            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            if((get_dev_state() & (1<< DEV_NUM_GPS1))== 0)
             {
-            can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
-        }
+              can_tx_raw_data(GPS_CANID,GOM_OBC_CANID,sendbufff,8,CFP_SINGLE,1,10);
+            }
         }
         if((buff[0]==0x00) && (buff[1]==0x02))
         {
@@ -237,10 +238,10 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[6] = Num_RC;
             sendbufff[7] = LCmd_ID;
             sendbufff[464] = buffer_checksum(sendbufff,464);
-            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            if((get_dev_state() & (1<< DEV_NUM_GPS1))== 0)
             {
-            can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,465,CFP_BEGIN,1,100);
-        }
+              can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,465,CFP_BEGIN,1,100);
+            }
         }
         if((buff[0]==0x00) && (buff[1]==0x01))
         {
@@ -263,8 +264,8 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             sendbufff[12] = min;
             sendbufff[13] = sec;
            // buffer_set_uint16(&sendbufff[14],ms);
-            sendbufff[14] = ms & 0xFF;  /*小端*/
-            sendbufff[15] = ms >> 8;
+            sendbufff[15] = ms & 0xFF;  /*大端*/
+            sendbufff[14] = ms >> 8;
             
             sendbufff[16] = 0xAA;
             buffer_set_uint32(&sendbufff[24],x_position);
@@ -294,10 +295,10 @@ int32_t dev_gpstel_handle(uint8_t* buff, uint8_t size)
             }
             
             sendbufff[86] = buffer_checksum(sendbufff,86);
-            if((get_dev_state() & (1<< DATA_GPS))== 0)
+            if((get_dev_state() & (1<< DEV_NUM_GPS1))== 0)
             {
-            can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,87,CFP_BEGIN,1,100);
-        }
+                can_tx_raw_data(Can_id,GOM_OBC_CANID,sendbufff,87,CFP_BEGIN,1,100);
+            }
         }
         else
         {

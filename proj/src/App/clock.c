@@ -15,6 +15,7 @@ timestamp_t g_clock_t = {(uint32_t)0,(uint32_t)0};
 
 void vApplicationTickHook()
 {
+  ///__disable_interrupt();   中断中调用
     g_clock_t.tv_usec += (uint32_t)1000000 / configTICK_RATE_HZ;
     while(g_clock_t.tv_usec >= (uint32_t)1000000)
     {
@@ -22,17 +23,22 @@ void vApplicationTickHook()
       g_clock_t.tv_sec++;
       driver_time_sechandle();
     }
+  ///__enable_interrupt(); 
 }
 
 
 void clock_get_time(timestamp_t * time)
 {
+  __disable_interrupt();   
   time->tv_usec = g_clock_t.tv_usec;
   time->tv_sec =  g_clock_t.tv_sec;
+  __enable_interrupt(); 
 }
 
 void clock_set_time(timestamp_t * time)
 {
+  __disable_interrupt();     
   g_clock_t.tv_usec = time->tv_usec;
   g_clock_t.tv_sec = time->tv_sec;
+  __enable_interrupt(); 
 }

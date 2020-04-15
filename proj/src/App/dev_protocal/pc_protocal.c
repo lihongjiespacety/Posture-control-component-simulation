@@ -27,7 +27,7 @@ static uint8_t s_framebuff_au8[FRAME_BUFF_MAX];   /*帧处理缓冲区*/
 static uint32_t s_framebuff_size=0;              /*帧缓冲区中数据长度*/
 
 
-static uint8_t s_dev_state_u8 = 0;              /*设备是否静默的状态 1静默 0不静默*/
+static uint32_t s_dev_state_u32 = 0;              /*设备是否静默的状态 1静默 0不静默*/
 
 
 /**
@@ -161,6 +161,7 @@ static int32_t pc_protocol_handle_data(uint8_t* buff, uint32_t size)
 static int32_t pc_protocol_handle_cmd(uint8_t* buff, uint32_t size)
 {
     uint16_t datalen = 0;
+    uint32_t state=0;
     int32_t res = 0;   /*处理状态  1需要继续处理 0不需要继续处理成功 -1不需要继续处理失败*/
     do
     {
@@ -173,17 +174,18 @@ static int32_t pc_protocol_handle_cmd(uint8_t* buff, uint32_t size)
                 switch(buff[1])
                 {
                     case 0:  /*静默指令*/
+                      state = (uint32_t)buff[3] | ((uint32_t)buff[4]<<8) | ((uint32_t)buff[5]<<16) | ((uint32_t)buff[4]<<24);
                       if(buff[2] == 0)
                       {
-                          s_dev_state_u8 = buff[3];
+                          s_dev_state_u32 = state;
                       }
                       else if(buff[2] == 1)
                       {
-                          s_dev_state_u8 |= buff[3];
+                          s_dev_state_u32 |= buff[3];
                       }
                       else if(buff[2] == 2)
                       {
-                          s_dev_state_u8 &= ~buff[3];
+                          s_dev_state_u32 &= ~buff[3];
                       }
                       else
                       {}
@@ -489,13 +491,13 @@ int32_t pc_protocol_ackhandle(void)
 
 /**
  *******************************************************************************
- * \fn          uint8_t get_dev_state(void)
+ * \fn          uint32_t get_dev_state(void)
  * \brief       获取设备静默状态.
  * \note        .
- * \return      uint8_t 状态值
+ * \return      uint32_t 状态值
  *******************************************************************************
  */
-uint8_t get_dev_state(void)
+uint32_t get_dev_state(void)
 {
-    return s_dev_state_u8;
+    return s_dev_state_u32;
 }
