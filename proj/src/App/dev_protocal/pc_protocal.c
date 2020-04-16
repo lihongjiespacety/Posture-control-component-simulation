@@ -209,7 +209,7 @@ static int32_t pc_protocol_handle_cmd(uint8_t* buff, uint32_t size)
         {
             res = 0;   /*数据处理完*/
         }
-    }while(res == 1);  /*如果需要继续处理从头开始*/
+    }while((res == 1) && (datalen>0));  /*如果需要继续处理从头开始*/
 
     return res;
 }

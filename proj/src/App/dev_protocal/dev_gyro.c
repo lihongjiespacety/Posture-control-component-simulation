@@ -9,7 +9,7 @@
 #include "obc_protocal.h"
 #include "pc_protocal.h"
 
-GYRO_Data_t s_gyro_data_at[GYRO_NUM];  /*记录PC发过来的数据*/
+GYRO_Data_t s_gyro_data_at[GYRO_NUM]={0};  /*记录PC发过来的数据*/
 static uint8_t Num_C = 0;    /*正确帧计数*/
 static uint8_t LCmd_ID = 0;  /*固定为0*/
 static uint8_t St_Cmd = 0;   /*时间指令执行状态*/

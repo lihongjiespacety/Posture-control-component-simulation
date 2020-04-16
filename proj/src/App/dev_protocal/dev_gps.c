@@ -10,7 +10,7 @@
 #include "obc_protocal.h"
 #include "pc_protocal.h"
 
-GPS_Data_t s_gps_data_at[GPS_NUM];  /*记录PC发过来的数据*/
+GPS_Data_t s_gps_data_at[GPS_NUM]={0};  /*记录PC发过来的数据*/
 
 static uint8_t Num_C = 0;    /*命令正确帧计数*/
 static uint8_t Num_T = 0;    /*遥测正确帧计数*/

@@ -229,7 +229,13 @@ int32_t dev_magt_init(void)
     GPIO_Init(GPIOD, &GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
     GPIO_Init(GPIOD, &GPIO_InitStructure);
-
+    
+    /*引脚PD13 PPS输出*/
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;      
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+    
     bsp_time7_init((uint32_t)1000000,(uint32_t)CHECK_TIME);  /*1M精度 定时周期1000uS*/
     bsp_time7_setcallback(dev_magt_gather);
     return 0;

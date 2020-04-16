@@ -7,7 +7,7 @@
 #include "obc_protocal.h"
 #include "pc_protocal.h"
 
-MAGTM_Data_t s_magtm_data_at[MAGTM_NUM];  /*记录PC发过来的数据*/
+MAGTM_Data_t s_magtm_data_at[MAGTM_NUM]={0};  /*记录PC发过来的数据*/
 
 /**
  *******************************************************************************

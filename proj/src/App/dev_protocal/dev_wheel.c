@@ -9,8 +9,8 @@
 #include "obc_protocal.h"
 #include "pc_protocal.h"
 
-WHEEL_Data_t s_wheel_data_at[WHEEL_NUM];     /*记录PC发过来的数据*/
-WHEEL_Data_t s_wheel_obcdata_at[WHEEL_NUM];  /*记录OBC发过来的反馈数据*/
+WHEEL_Data_t s_wheel_data_at[WHEEL_NUM]={0};     /*记录PC发过来的数据*/
+WHEEL_Data_t s_wheel_obcdata_at[WHEEL_NUM]={0};  /*记录OBC发过来的反馈数据*/
 
 static uint8_t Num_T[4] =  {0};    /*遥测正确帧计数*/
 static uint8_t SetNetNum_T[4] =  {0};   

@@ -1,13 +1,14 @@
 #include <stdint.h>
 #include <string.h>
 #include "common.h"
+#include "clock.h"
 #include "osapi_freertos.h"
 #include "dev_starsensor.h"
 #include "can.h"
 #include "obc_protocal.h"
 #include "pc_protocal.h"
 
-STARSENSOR_Data_t s_starsensor_data_at[STARSENSOR_NUM];  /*记录PC发过来的数据*/
+STARSENSOR_Data_t s_starsensor_data_at[STARSENSOR_NUM]={0};  /*记录PC发过来的数据*/
 
 static uint8_t Num_C = 0;    /*命令正确帧计数*/
 static uint8_t Num_T = 0;    /*遥测正确帧计数*/
@@ -103,20 +104,19 @@ int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
      int32_t q2;
      int32_t q3;
      int32_t q4;
-     uint32_t sec;
-     uint32_t us;
      uint8_t exposure;
      uint8_t state;
      int32_t x_speed;
      int32_t y_speed;
      int32_t z_speed;
+     timestamp_t  ts;
+     clock_get_time(&ts);
+     ts.tv_usec /= 41;
     __disable_interrupt();      /*保证读数据是同时更新的*/    
     q1 =  s_starsensor_data_at[subtype].i;
     q2 =  s_starsensor_data_at[subtype].j;
     q3 =  s_starsensor_data_at[subtype].k;
     q4 =  s_starsensor_data_at[subtype].q;
-    sec = s_starsensor_data_at[subtype].sec;
-    us = s_starsensor_data_at[subtype].us;
     x_speed = s_starsensor_data_at[subtype].x_speed;
     y_speed = s_starsensor_data_at[subtype].y_speed;
     z_speed = s_starsensor_data_at[subtype].z_speed;
@@ -145,6 +145,11 @@ int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
         buffer_set_int32(&sendbufff[12],q2);
         buffer_set_int32(&sendbufff[16],q3);
         buffer_set_int32(&sendbufff[20],q4);
+        buffer_set_int32(&sendbufff[24],ts.tv_sec);
+        
+        sendbufff[28] = ts.tv_usec >> 16;
+        sendbufff[29] = ts.tv_usec >> 8;
+        sendbufff[30] = ts.tv_usec >> 0;
         
         sendbufff[32] = exposure;
         
@@ -158,11 +163,6 @@ int32_t dev_starsensortel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
         sendbufff[54] = (uint8_t)(z_speed>>8);
         sendbufff[55] = (uint8_t)(z_speed>>0);
         
-        buffer_set_uint32(&sendbufff[24],sec);
-        sendbufff[28] = (uint8_t)(us>>16);
-        sendbufff[29] = (uint8_t)(us>>8);
-        sendbufff[30] = (uint8_t)(us>>0);
-           
         sendbufff[38] = state;
         sendbufff[56]=buffer_checksum(sendbufff,56);
         if((get_dev_state() & ((uint32_t)1<< (DEV_NUM_STARSENSOR1+subtype)))== 0)

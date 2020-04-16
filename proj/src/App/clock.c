@@ -10,6 +10,7 @@
 #include "osapi_freertos.h"
 #include "shell.h"
 #include "clock.h"
+#include "stm32f10x.h"
 
 timestamp_t g_clock_t = {(uint32_t)0,(uint32_t)0};
 
@@ -17,8 +18,13 @@ void vApplicationTickHook()
 {
   ///__disable_interrupt();   中断中调用
     g_clock_t.tv_usec += (uint32_t)1000000 / configTICK_RATE_HZ;
+//    if((g_clock_t.tv_usec % (uint32_t)1000000) == 0)
+//    {
+//      GPIOD->ODR ^= 1<<13;
+//    }
     while(g_clock_t.tv_usec >= (uint32_t)1000000)
     {
+      GPIOD->ODR ^= 1<<13;
       g_clock_t.tv_usec -= (uint32_t)1000000;
       g_clock_t.tv_sec++;
       driver_time_sechandle();
