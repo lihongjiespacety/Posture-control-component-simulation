@@ -269,11 +269,11 @@ int can_process_frame(can_frame_t *f)
 	/* don't process can frame from myself, or not our business */
 	//if (src_id == can_getid() || src_id == own_csp_can_id || (dst_id != own_csp_can_id && dst_id != EPS_CANID))
 		//return 1;
-    if(src_id != GOM_OBC_CANID)
+    if((src_id != GOM_OBC_CANID)  && (src_id != WHEEL_X_CANID) && (src_id != WHEEL_Y_CANID) && (src_id != WHEEL_Z_CANID) && (src_id != WHEEL_A_CANID))
     {
         return 1;  /*只接收OBC的数据*/
     }
-	if (is_canid_valid(dst_id) == 0)
+	if ((is_canid_valid(dst_id)) == 0 && (dst_id!=0))
 		return 1;
 	buf = can_pbuf_find(id, CFP_ID_CONN_MASK);
 	/* Check returned buffer */
@@ -414,7 +414,7 @@ int can_process_frame(can_frame_t *f)
 				//process_obc_update_request(buf->packet);
 			}
             //can_tx_raw_data(CFP_DST(buf->packet->id.ext),CFP_SRC(buf->packet->id.ext),buf->packet->data,buf->packet->length,(cfp_ext_t)CFP_TYPE(buf->packet->id.ext),1,100);
-            obc_protocol_handle_data(CFP_DST(buf->packet->id.ext),buf->packet->data,buf->packet->length);
+            obc_protocol_handle_data(CFP_DST(buf->packet->id.ext),CFP_SRC(buf->packet->id.ext),buf->packet->data,buf->packet->length);
             csp_buffer_free(buf->packet);
 		}
 		/* Drop packet buffer reference */
@@ -725,6 +725,7 @@ int can_init(uint32_t id, uint32_t mask, struct csp_can_config *conf)
   //driver_can_filter(0,0,id,mask);
   //driver_can_filter(0,0,(uint32_t)can_getid()<<13,(uint32_t)0xFF<<13);
   //driver_can_filter(1,0,(uint32_t)can_getid()<<19,(uint32_t)0x1F<<19);
+  driver_can_filter(0, 0, (uint32_t)can_getid() << 13, (uint32_t)0xFF << 13);
   return 0;
 }
 

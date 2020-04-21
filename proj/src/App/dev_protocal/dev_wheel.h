@@ -15,6 +15,7 @@ typedef __packed struct
     float   speed;
     float   toq;
     uint8_t mode;
+    float   rspeed;
 }WHEEL_Data_t;
 
 
@@ -98,6 +99,20 @@ int32_t dev_wheelztel_handle(uint8_t* buff, uint8_t size);
  *******************************************************************************
  */
 int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size);
+
+/**
+ *******************************************************************************
+ * \fn          int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
+ * \brief       处理飞轮遥测包.
+ * \note        处理飞轮遥测包.
+ * \param[in]   buff     数据.
+ * \param[in]   canid  id.
+ * \param[in]   size     数据内容长度.
+ * \retval      0 成功
+ * \retval      其他值 失败
+ *******************************************************************************
+ */
+int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size);
 
 #ifdef __cplusplus
 }

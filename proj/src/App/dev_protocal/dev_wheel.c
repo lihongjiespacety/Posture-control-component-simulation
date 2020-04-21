@@ -10,7 +10,7 @@
 #include "pc_protocal.h"
 
 WHEEL_Data_t s_wheel_data_at[WHEEL_NUM]={0};     /*记录PC发过来的数据*/
-WHEEL_Data_t s_wheel_obcdata_at[WHEEL_NUM]={0};  /*记录OBC发过来的反馈数据*/
+WHEEL_Data_t s_wheel_obcdata_at[WHEEL_NUM]={0};  /*记录OBC发过来的反馈数据 和实际的轮子反馈的实际速度*/
 
 static uint8_t Num_T[4] =  {0};    /*遥测正确帧计数*/
 static uint8_t SetNetNum_T[4] =  {0};   
@@ -213,5 +213,46 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
     {
         Num_RC[subtype]++;
     } 
+    return 0;
+}
+
+
+/**
+ *******************************************************************************
+ * \fn          int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
+ * \brief       处理飞轮遥测包.
+ * \note        处理飞轮遥测包.
+ * \param[in]   buff     数据. 指向数据包中去掉前两字节长度后的位置
+ * \param[in]   canid  id.
+ * \param[in]   size     数据内容长度.
+ * \retval      0 成功
+ * \retval      其他值 失败
+ *******************************************************************************
+ */
+int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
+{
+    switch(canid)
+    {
+      case WHEEL_X_CANID:
+      __disable_interrupt(); 
+      memcpy(&s_wheel_obcdata_at[0].rspeed ,&buff[14],4);
+      __enable_interrupt(); 
+      break;
+      case WHEEL_Y_CANID:
+      __disable_interrupt(); 
+      memcpy(&s_wheel_obcdata_at[1].rspeed ,&buff[14],4);
+      __enable_interrupt(); 
+      break;
+      case WHEEL_Z_CANID:
+      __disable_interrupt(); 
+      memcpy(&s_wheel_obcdata_at[2].rspeed ,&buff[14],4);
+      __enable_interrupt(); 
+      break;
+      case WHEEL_A_CANID:
+      __disable_interrupt(); 
+      memcpy(&s_wheel_obcdata_at[3].rspeed ,&buff[14],4);
+      __enable_interrupt(); 
+      break;
+    }
     return 0;
 }

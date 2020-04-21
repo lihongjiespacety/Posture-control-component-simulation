@@ -193,7 +193,12 @@ int main(void)
   csp_debug_hook_set(csp_debug_hook);
   driver_time_init();
   driver_can_init(500000);
-  dev_magt_init();
+  driver_can_filter(0, 0, (uint32_t)0 << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 OBC发过来的数据*/
+  driver_can_filter(1, 0, (uint32_t)WHEEL_X_CANID << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 飞轮发过来的数据*/
+  driver_can_filter(2, 0, (uint32_t)WHEEL_Y_CANID << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 飞轮发过来的数据*/
+  driver_can_filter(3, 0, (uint32_t)WHEEL_Z_CANID << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 飞轮发过来的数据*/
+  driver_can_filter(4, 0, (uint32_t)WHEEL_A_CANID << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 飞轮发过来的数据*/
+  //dev_magt_init();
   //driver_iic_init(1,1,0,0,0);
   //NVIC_Configuration();
   //I2C_LowLevel_Init(I2C2);
