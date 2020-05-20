@@ -77,9 +77,9 @@ UART12 HAL_UART_7 上行485
 #define DRIVER_UART5_TXBUF_SIZE (128)       /**< UART5发送缓冲区大小  */    
 #define DRIVER_UART5_RXBUF_SIZE (128)       /**< UART5接收缓冲区大小  */ 
 
-#define DRIVER_UART_DELAY_FIFO    (20)    /**< 缓冲区操作延时时间       */   
+#define DRIVER_UART_DELAY_FIFO    (5)    /**< 缓冲区操作延时时间       */   
 #define DRIVER_UART_DELAY_CHECK   (1)      /**< 缓冲区延时查询时间间隔   */
-#define DRIVER_UART_DELAY_FRAME   (20)    /**< 字节间距大于该值认为帧结束   */
+#define DRIVER_UART_DELAY_FRAME   (5)    /**< 字节间距大于该值认为帧结束   */
          
 typedef void (*driver_uart_hook)(void);      /**< 发送/接收回调函数   */   
 

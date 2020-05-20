@@ -174,6 +174,7 @@ enum hal_uart_baud
     HAL_UART_BAUD_38400=38400,    /**< UART波特率38400 */ 
     HAL_UART_BAUD_57600=57600,    /**< UART波特率38400 */ 
     HAL_UART_BAUD_115200=115200,  /**< UART波特率115200 */
+    HAL_UART_BAUD_256000=256000,  /**< UART波特率256000 */
 };
 
 typedef struct hal_uart_cfg HAL_UART_CFG_t;  /**< UART配置结构体  */

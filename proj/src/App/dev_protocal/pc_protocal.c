@@ -13,7 +13,7 @@
 #include "common.h"
 
 #define READ_BUFF_MAX 256   /*读一次串口大小*/
-#define READ_TIMEOUT 30   /*读一次串口超时时间*/
+#define READ_TIMEOUT 10   /*读一次串口超时时间*/
 
 #define FRAME_MINI_SIZE 6   /*一帧数据最小长度*/
 #define FRAME_HEAD_SIZE 5   /*帧头长度*/
@@ -22,7 +22,8 @@
 #define HEAD_FLAG1 0xAA
 #define HEAD_FLAG2 0x55
 
-
+static uint32_t rcvsum=0;
+static uint32_t rcvnum=0;
 static uint8_t s_framebuff_au8[FRAME_BUFF_MAX];   /*帧处理缓冲区*/
 static uint32_t s_framebuff_size=0;              /*帧缓冲区中数据长度*/
 
@@ -268,6 +269,7 @@ static int32_t pc_protocol_handle(uint8_t* buff, uint32_t* size)
                             switch(buff[4])
                             {
                                 case 0:
+                                    rcvnum++;
                                     pc_protocol_handle_data(buff+FRAME_HEAD_SIZE,datalen-FRAME_MINI_SIZE);  /*处理数据帧*/
                                     pc_protocol_ackhandle(); /*发送返回帧数据*/
                                 break;
@@ -321,6 +323,7 @@ static int32_t pc_protocol_handle(uint8_t* buff, uint32_t* size)
 
 
 
+
 /**
  * 与PC通讯串口协议处理任务
  */
@@ -333,7 +336,7 @@ void uarttask(void *pvParameters )
     /*初始化与PC通讯的串口*/
     HAL_UART_CFG_t cfg;
     cfg.id = HAL_UART_4;
-    cfg.baud = HAL_UART_BAUD_115200;
+    cfg.baud = 256000;
     cfg.datalen = HAL_UART_DATA_8;
     cfg.parity = HAL_UART_PARITY_NONE;
     cfg.stopb = HAL_UART_STOPB_1;
@@ -362,6 +365,7 @@ void uarttask(void *pvParameters )
                 toreadlen = FRAME_BUFF_MAX-s_framebuff_size;  /*如果帧缓冲区能放的下数据小于 读缓冲区 那么只读能存的下的大小*/
             }
             readlen = driver_uart_recv(HAL_UART_4, readbuff, toreadlen, READ_TIMEOUT, &erro);
+            rcvsum += readlen;
             if(readlen > 0)
             {
                 memcpy(&s_framebuff_au8[s_framebuff_size],readbuff,readlen);
