@@ -19,6 +19,8 @@ static uint8_t LCmd_ID[4] =  {0};  /*最近执行指令吗*/
 static uint8_t Num_RC[4] =  {0};  /*错误帧计数*/
 static uint8_t CAN_ID[4] =  {WHEEL_X_CANID,WHEEL_Y_CANID,WHEEL_Z_CANID,WHEEL_A_CANID};   /*ID*/
 
+static uint8_t g_wheeltype = 0;    /*0德国飞轮 1揽月飞轮*/
+
 /**
  *******************************************************************************
  * \fn          int32_t dev_wheeldata_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
@@ -119,6 +121,8 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
     if(size == 8)
     {
       
+        if(WHEEL_TYPE_VRW == g_wheeltype)
+        {
         if(buff[0] == 0x21)
         {
             /*设置最大力矩  将数据通过串口转发到PC*/ 
@@ -209,11 +213,89 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             //Num_RC[subtype]++;
         }
     }
+        else if(WHEEL_TYPE_LY == g_wheeltype)
+        {
+            if((buff[0] == 0x05) && (buff[1] == 0xD0))
+            {
+                /*设置CANID指令*/
+                LCmd_ID[subtype] = 0xD0;
+            }
+            else if((buff[0] == 0x05) && (buff[1] == 0xD1))
+            {
+                /*电流指令*/
+                LCmd_ID[subtype] = 0xD1;
+            }
+            else if((buff[0] == 0x05) && (buff[1] == 0xD2))
+            {
+                /*设置速度*/
+                s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
+                memcpy(&(s_wheel_obcdata_at[subtype].speed),&buff[2],4);    /*传过来的是大端 直接大端发送  rpm*/
+                SetSpeedNum_T[subtype]++;
+                LCmd_ID[subtype] = 0xD2;
+                ///pc_protocol_initbuffer(sendbufff, &topcsize,sizeof(sendbufff));
+                ///pc_protocol_apendbuffer(sendbufff,&topcsize,sizeof(sendbufff),&s_wheel_obcdata_at[subtype],sizeof(WHEEL_Data_t),DATA_WHEEL,subtype);
+                ///driver_uart_send(HAL_UART_4, sendbufff, topcsize, 10, &erro);
+            }
+            else if((buff[0] == 0x05) && (buff[1] == 0xD3))
+            {
+                /*设置伪net力矩 rpm/s*/
+                s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
+                __disable_interrupt();      /*保证读数据是同时更新的*/    
+                memcpy(&(s_wheel_obcdata_at[subtype].toq),&buff[2],4);    
+                __enable_interrupt(); 
+                SetNetNum_T[subtype]++;
+                LCmd_ID[subtype] = 0xD3;
+              
+            }
+            else if((buff[0] == 0x00) && (buff[1] == 0x01))
+            {
+                /*接收到遥测请求响应遥测包*/
+                Num_T[subtype]++;
+                //LCmd_ID[subtype] = 0x20;
+                
+                sendbufff[0] = 0x00;
+                sendbufff[1] = 0x1D;
+                sendbufff[2] = 0x35;
+                sendbufff[3] = 0x01;
+                sendbufff[4] = Num_T[subtype];
+                sendbufff[5] = 0;
+                sendbufff[6] = Num_RC[subtype];
+                sendbufff[7] = LCmd_ID[subtype];
+                
+                memcpy(&buff[11],&(s_wheel_obcdata_at[subtype].speed),4);   
+                buff[15] = *(uint8_t*)(&s_wheel_data_at[subtype].speed);
+                buff[16] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+1);
+                buff[17] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+2);
+                buff[18] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+3);
+                
+                sendbufff[31]=buffer_checksum(sendbufff,31);
+                if((get_dev_state() & (1<< (DEV_NUM_WHEEL1+subtype)))== 0)
+                {
+                  can_tx_raw_data(CAN_ID[subtype],GOM_OBC_CANID,sendbufff,32,CFP_BEGIN,1,100);
+                }
+            }
+            else
+            {
+                //Num_RC[subtype]++;
+            }
+        }
+        else{}
+    }
     else
     {
         Num_RC[subtype]++;
     } 
     return 0;
+}
+
+void dev_set_wheeltype(uint8_t type)
+{
+    g_wheeltype = type;
+}
+
+uint8_t dev_get_wheeltype(void)
+{
+    return g_wheeltype;
 }
 
 
@@ -235,22 +317,54 @@ int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
     {
       case WHEEL_X_CANID:
       __disable_interrupt(); 
+      if(WHEEL_TYPE_VRW == g_wheeltype)
+      {
       memcpy(&s_wheel_obcdata_at[0].rspeed ,&buff[14],4);
+      }
+      else if(WHEEL_TYPE_LY == g_wheeltype)
+      {
+          memcpy(&s_wheel_obcdata_at[0].rspeed ,&buff[13],4);
+      }
+      else{}
       __enable_interrupt(); 
       break;
       case WHEEL_Y_CANID:
       __disable_interrupt(); 
+      if(WHEEL_TYPE_VRW == g_wheeltype)
+      {
       memcpy(&s_wheel_obcdata_at[1].rspeed ,&buff[14],4);
+      }
+      else if(WHEEL_TYPE_LY == g_wheeltype)
+      {
+          memcpy(&s_wheel_obcdata_at[1].rspeed ,&buff[13],4);
+      }
+      else{}
       __enable_interrupt(); 
       break;
       case WHEEL_Z_CANID:
       __disable_interrupt(); 
+      if(WHEEL_TYPE_VRW == g_wheeltype)
+      {
       memcpy(&s_wheel_obcdata_at[2].rspeed ,&buff[14],4);
+      }
+      else if(WHEEL_TYPE_LY == g_wheeltype)
+      {
+          memcpy(&s_wheel_obcdata_at[2].rspeed ,&buff[13],4);
+      }
+      else{}
       __enable_interrupt(); 
       break;
       case WHEEL_A_CANID:
       __disable_interrupt(); 
+      if(WHEEL_TYPE_VRW == g_wheeltype)
+      {
       memcpy(&s_wheel_obcdata_at[3].rspeed ,&buff[14],4);
+      }
+      else if(WHEEL_TYPE_LY == g_wheeltype)
+      {
+          memcpy(&s_wheel_obcdata_at[3].rspeed ,&buff[13],4);
+      }
+      else{}
       __enable_interrupt(); 
       break;
     }

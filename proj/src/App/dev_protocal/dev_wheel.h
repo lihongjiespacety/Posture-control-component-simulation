@@ -20,6 +20,18 @@ typedef __packed struct
 
 
 /**
+ * \enum WHEEL_Type_e
+ * 飞轮类型枚举.
+ */
+typedef enum  
+{
+    WHEEL_TYPE_VRW = 0,   /*德国飞轮*/
+    WHEEL_TYPE_LY,        /*揽月飞轮*/
+}WHEEL_Type_e;
+
+
+
+/**
  *******************************************************************************
  * \fn          int32_t dev_wheeldata_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
  * \brief       处理飞轮子块数据.

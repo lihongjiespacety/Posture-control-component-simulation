@@ -4,6 +4,7 @@
 #include "osapi_freertos.h"
 #include "dev_magtm.h"
 #include "dev_starsensor.h"
+#include "dev_wheel.h"
 #include "dev_gps.h"
 #include "dev_ssoc.h"
 #include "dev_gyro.h"
@@ -175,7 +176,7 @@ static int32_t pc_protocol_handle_cmd(uint8_t* buff, uint32_t size)
                 switch(buff[1])
                 {
                     case 0:  /*静默指令*/
-                      state = (uint32_t)buff[3] | ((uint32_t)buff[4]<<8) | ((uint32_t)buff[5]<<16) | ((uint32_t)buff[4]<<24);
+                      state = (uint32_t)buff[3] | ((uint32_t)buff[4]<<8) | ((uint32_t)buff[5]<<16) | ((uint32_t)buff[6]<<24);
                       if(buff[2] == 0)
                       {
                           s_dev_state_u32 = state;
@@ -192,6 +193,8 @@ static int32_t pc_protocol_handle_cmd(uint8_t* buff, uint32_t size)
                       {}
                     break;
                     case 1:
+                      /*飞轮类型设置指令*/
+                      dev_set_wheeltype(buff[3]);
                     break;
                 
                 }

@@ -82,7 +82,7 @@ int32_t obc_protocol_handle_data(uint8_t canid, uint8_t srccanid, uint8_t* buff,
             dev_gyrotel_handle(p,size);
         break;
         case GOM_OBC_CANID:
-            /*设备返回的遥测数据*/
+            /*实际的设备返回的遥测数据*/
             dev_wheeltel_tlhandle(p,srccanid,size);
         break;
         default:
