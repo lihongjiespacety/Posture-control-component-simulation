@@ -5,7 +5,7 @@
  extern "C" {
 #endif
    
-#define STARSENSOR_NUM 1 /*定义星敏的个数*/
+#define STARSENSOR_NUM 3 /*定义星敏的个数*/
 /**
  * \enum STARSENSOR_Data_t
  * 星敏子块内容.

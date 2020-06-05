@@ -126,6 +126,8 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size);
  */
 int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size);
 
+void dev_set_wheeltype(uint8_t type);
+
 #ifdef __cplusplus
 }
 #endif
