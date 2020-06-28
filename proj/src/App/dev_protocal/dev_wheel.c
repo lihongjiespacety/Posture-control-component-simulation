@@ -229,7 +229,7 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
             {
                 /*设置速度*/
                 s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
-                memcpy(&(s_wheel_obcdata_at[subtype].speed),&buff[2],4);    /*传过来的是大端 直接大端发送  rpm*/
+                memcpy(&(s_wheel_obcdata_at[subtype].speed),&buff[3],4);    /*传过来的是大端 直接大端发送  rpm*/
                 SetSpeedNum_T[subtype]++;
                 LCmd_ID[subtype] = 0xD2;
                 ///pc_protocol_initbuffer(sendbufff, &topcsize,sizeof(sendbufff));
@@ -241,7 +241,7 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
                 /*设置伪net力矩 rpm/s*/
                 s_wheel_obcdata_at[subtype].mode = s_wheel_data_at[subtype].mode;
                 __disable_interrupt();      /*保证读数据是同时更新的*/    
-                memcpy(&(s_wheel_obcdata_at[subtype].toq),&buff[2],4);    
+                memcpy(&(s_wheel_obcdata_at[subtype].toq),&buff[3],4);    
                 __enable_interrupt(); 
                 SetNetNum_T[subtype]++;
                 LCmd_ID[subtype] = 0xD3;
@@ -262,11 +262,11 @@ int32_t dev_wheeltel_handle(uint8_t* buff, uint8_t subtype, uint8_t size)
                 sendbufff[6] = Num_RC[subtype];
                 sendbufff[7] = LCmd_ID[subtype];
                 
-                memcpy(&buff[11],&(s_wheel_obcdata_at[subtype].speed),4);   
-                buff[15] = *(uint8_t*)(&s_wheel_data_at[subtype].speed);
-                buff[16] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+1);
-                buff[17] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+2);
-                buff[18] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+3);
+                memcpy(&sendbufff[11],&(s_wheel_obcdata_at[subtype].speed),4);   
+                sendbufff[18] = *(uint8_t*)(&s_wheel_data_at[subtype].speed);
+                sendbufff[17] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+1);
+                sendbufff[16] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+2);
+                sendbufff[15] = *((uint8_t*)(&s_wheel_data_at[subtype].speed)+3);
                 
                 sendbufff[31]=buffer_checksum(sendbufff,31);
                 if((get_dev_state() & (1<< (DEV_NUM_WHEEL1+subtype)))== 0)
