@@ -19,7 +19,7 @@ static uint8_t LCmd_ID[4] =  {0};  /*最近执行指令吗*/
 static uint8_t Num_RC[4] =  {0};  /*错误帧计数*/
 static uint8_t CAN_ID[4] =  {WHEEL_X_CANID,WHEEL_Y_CANID,WHEEL_Z_CANID,WHEEL_A_CANID};   /*ID*/
 
-static uint8_t g_wheeltype = 0;    /*0德国飞轮 1揽月飞轮*/
+static uint8_t g_wheeltype = 1;    /*0德国飞轮 1揽月飞轮*/
 
 /**
  *******************************************************************************
@@ -313,17 +313,21 @@ uint8_t dev_get_wheeltype(void)
  */
 int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
 {
+    if(size<=8)
+    {
+        return -1;
+    }
     switch(canid)
     {
       case WHEEL_X_CANID:
       __disable_interrupt(); 
       if(WHEEL_TYPE_VRW == g_wheeltype)
       {
-      memcpy(&s_wheel_obcdata_at[0].rspeed ,&buff[14],4);
+          memcpy(&(s_wheel_obcdata_at[0].rspeed) ,&buff[14],4);
       }
       else if(WHEEL_TYPE_LY == g_wheeltype)
       {
-          memcpy(&s_wheel_obcdata_at[0].rspeed ,&buff[13],4);
+          memcpy(&(s_wheel_obcdata_at[0].rspeed) ,&buff[13],4);
       }
       else{}
       __enable_interrupt(); 
@@ -332,11 +336,11 @@ int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
       __disable_interrupt(); 
       if(WHEEL_TYPE_VRW == g_wheeltype)
       {
-      memcpy(&s_wheel_obcdata_at[1].rspeed ,&buff[14],4);
+          memcpy(&(s_wheel_obcdata_at[1].rspeed) ,&buff[14],4);
       }
       else if(WHEEL_TYPE_LY == g_wheeltype)
       {
-          memcpy(&s_wheel_obcdata_at[1].rspeed ,&buff[13],4);
+          memcpy(&(s_wheel_obcdata_at[1].rspeed) ,&buff[13],4);
       }
       else{}
       __enable_interrupt(); 
@@ -345,11 +349,11 @@ int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
       __disable_interrupt(); 
       if(WHEEL_TYPE_VRW == g_wheeltype)
       {
-      memcpy(&s_wheel_obcdata_at[2].rspeed ,&buff[14],4);
+          memcpy(&(s_wheel_obcdata_at[2].rspeed) ,&buff[14],4);
       }
       else if(WHEEL_TYPE_LY == g_wheeltype)
       {
-          memcpy(&s_wheel_obcdata_at[2].rspeed ,&buff[13],4);
+          memcpy(&(s_wheel_obcdata_at[2].rspeed) ,&buff[13],4);
       }
       else{}
       __enable_interrupt(); 
@@ -358,11 +362,11 @@ int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
       __disable_interrupt(); 
       if(WHEEL_TYPE_VRW == g_wheeltype)
       {
-      memcpy(&s_wheel_obcdata_at[3].rspeed ,&buff[14],4);
+          memcpy(&(s_wheel_obcdata_at[3].rspeed) ,&buff[14],4);
       }
       else if(WHEEL_TYPE_LY == g_wheeltype)
       {
-          memcpy(&s_wheel_obcdata_at[3].rspeed ,&buff[13],4);
+          memcpy(&(s_wheel_obcdata_at[3].rspeed) ,&buff[13],4);
       }
       else{}
       __enable_interrupt(); 

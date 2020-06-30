@@ -29,7 +29,7 @@ static uint8_t s_framebuff_au8[FRAME_BUFF_MAX];   /*帧处理缓冲区*/
 static uint32_t s_framebuff_size=0;              /*帧缓冲区中数据长度*/
 
 
-static uint32_t s_dev_state_u32 = 0;              /*设备是否静默的状态 1静默 0不静默*/
+static uint32_t s_dev_state_u32 = 0xFFFFFFFF;              /*设备是否静默的状态 1静默 0不静默*/
 
 
 /**
