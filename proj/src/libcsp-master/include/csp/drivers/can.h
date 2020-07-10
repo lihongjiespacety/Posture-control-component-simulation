@@ -124,7 +124,7 @@ typedef enum
 	RASPBERRY_CANID = 0x80,
 } gom_obc_can_id;
 
-#define CANDEV_NUM 10
+#define CANDEV_NUM 11
 extern uint8_t s_canid_au8[CANDEV_NUM];
 typedef enum {
 	CAN_ERROR = 0,

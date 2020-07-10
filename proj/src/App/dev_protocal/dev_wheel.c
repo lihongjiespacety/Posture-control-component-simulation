@@ -371,6 +371,12 @@ int32_t dev_wheeltel_tlhandle(uint8_t* buff, uint8_t canid, uint8_t size)
       else{}
       __enable_interrupt(); 
       break;
+      case UNUSED_CANID_6:  /*Ä§·½·ÉÂÖ*/
+      __disable_interrupt(); 
+      memset(&(s_wheel_obcdata_at[1].rspeed),0,4);
+      memcpy(&(s_wheel_obcdata_at[1].rspeed) ,&buff[9],3);
+      __enable_interrupt(); 
+      break;
     }
     return 0;
 }

@@ -72,7 +72,7 @@ can_info_t  g_can_info_t;
 extern uint8_t ty_starss_flag;
 
 
-uint8_t s_canid_au8[CANDEV_NUM]={GPS_CANID,EXT_MAGTM_CANID,WHEEL_X_CANID,WHEEL_Y_CANID,WHEEL_Z_CANID,WHEEL_A_CANID,STAR_SENSOR_CANID,STAR_SENSOR2_CANID,STAR_SENSOR3_CANID,OPTI_GYRO_CANID};  /*新增设备要将CANID添加至此*/
+uint8_t s_canid_au8[CANDEV_NUM]={GPS_CANID,EXT_MAGTM_CANID,WHEEL_X_CANID,WHEEL_Y_CANID,WHEEL_Z_CANID,WHEEL_A_CANID,STAR_SENSOR_CANID,STAR_SENSOR2_CANID,STAR_SENSOR3_CANID,OPTI_GYRO_CANID,UNUSED_CANID_6};  /*新增设备要将CANID添加至此*/
 
 uint8_t is_canid_valid(uint8_t canid)
 {
@@ -269,7 +269,7 @@ int can_process_frame(can_frame_t *f)
 	/* don't process can frame from myself, or not our business */
 	//if (src_id == can_getid() || src_id == own_csp_can_id || (dst_id != own_csp_can_id && dst_id != EPS_CANID))
 		//return 1;
-    if((src_id != GOM_OBC_CANID)  && (src_id != WHEEL_X_CANID) && (src_id != WHEEL_Y_CANID) && (src_id != WHEEL_Z_CANID) && (src_id != WHEEL_A_CANID))
+    if((src_id != GOM_OBC_CANID)  && (src_id != WHEEL_X_CANID) && (src_id != WHEEL_Y_CANID) && (src_id != WHEEL_Z_CANID) && (src_id != WHEEL_A_CANID) && (src_id != UNUSED_CANID_6))
     {
         return 1;  /*只接收OBC的数据*/
     }

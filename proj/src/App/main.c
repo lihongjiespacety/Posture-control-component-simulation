@@ -198,6 +198,8 @@ int main(void)
   driver_can_filter(2, 0, (uint32_t)WHEEL_Y_CANID << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 飞轮发过来的数据*/
   driver_can_filter(3, 0, (uint32_t)WHEEL_Z_CANID << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 飞轮发过来的数据*/
   driver_can_filter(4, 0, (uint32_t)WHEEL_A_CANID << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 飞轮发过来的数据*/
+  driver_can_filter(5, 0, (uint32_t)UNUSED_CANID_6 << 21, (uint32_t)0xFF << 21);  /*接收源地址为0的 飞魔方轮发过来的数据*/
+  
   //dev_magt_init();
   //driver_iic_init(1,1,0,0,0);
   //NVIC_Configuration();
