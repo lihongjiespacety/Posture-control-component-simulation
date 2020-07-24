@@ -114,6 +114,28 @@ int32_t pc_protocol_ackhandle(void);
 
 /**
  *******************************************************************************
+ * \fn          int32_t pc_protocol_setswitch(uint8_t* buff)
+ * \brief       设置继电器参数.
+ * \note        
+ * \retval      0 成功
+ * \retval      其他值 失败
+ *******************************************************************************
+ */
+int32_t pc_protocol_setswitch(uint8_t* buff);
+
+/**
+ *******************************************************************************
+ * \fn          int32_t pc_protocol_ackswitch(uint8_t ch)
+ * \brief       返回继电器参数.
+ * \note        接收到读取参数指令后返回.
+ * \retval      0 成功
+ * \retval      其他值 失败
+ *******************************************************************************
+ */
+int32_t pc_protocol_ackswitch(uint8_t ch);
+
+/**
+ *******************************************************************************
  * \fn          uint32_t get_dev_state(void)
  * \brief       获取设备静默状态.
  * \note        .
@@ -122,7 +144,9 @@ int32_t pc_protocol_ackhandle(void);
  */
 uint32_t get_dev_state(void);
 
+void switch_set_par(uint8_t ch,uint32_t onmin,uint32_t onmax,uint32_t offmin,uint32_t offmax);
 
+void switch_get_par(uint8_t ch,uint32_t* onmin,uint32_t* onmax,uint32_t* offmin,uint32_t* offmax);
 #ifdef __cplusplus
 }
 #endif

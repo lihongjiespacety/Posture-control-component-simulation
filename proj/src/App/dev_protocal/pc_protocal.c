@@ -196,6 +196,14 @@ static int32_t pc_protocol_handle_cmd(uint8_t* buff, uint32_t size)
                       /*飞轮类型设置指令*/
                       dev_set_wheeltype(buff[3]);
                     break;
+                    case 2:
+                      /*继电器参数设置指令*/
+                    pc_protocol_setswitch(&buff[2]);
+                    break;
+                    case 3:
+                      /*继电器参数获取指令*/
+                      pc_protocol_ackswitch(buff[2]);
+                    break;
                 
                 }
                 /*调整数据继续处理*/
@@ -495,7 +503,74 @@ int32_t pc_protocol_ackhandle(void)
     return 0;
 }
 
+/**
+ *******************************************************************************
+ * \fn          int32_t pc_protocol_ackswitch(uint8_t ch)
+ * \brief       返回继电器参数.
+ * \note        接收到读取参数指令后返回.
+ * \retval      0 成功
+ * \retval      其他值 失败
+ *******************************************************************************
+ */
+int32_t pc_protocol_ackswitch(uint8_t ch)
+{
+	int32_t erro;
+	char buff[32];
 
+        uint32_t onmin,onmax,offmin,offmax;
+        switch_get_par(ch,&onmin,&onmax,&offmin,&offmax);
+	buff[0] = 0xAA;
+	buff[1] = 0x55;
+	buff[2] = 0;  /*长度 大端*/
+	buff[3] = 25;
+
+	buff[4] = 2;    /*返回帧*/
+
+	/*子块*/
+	buff[5] = 19;
+	buff[6] = 8;                       /*子块类型 命令类型*/
+	buff[7] = ch;                     /*子块子类型 继电器序号*/
+        buff[8] = (onmin>>24) & 0xFF;        /*On最小时间 大端*/
+        buff[9] = (onmin>>16) & 0xFF; 
+	buff[10] = (onmin>>8) & 0xFF; 
+	buff[11] = (onmin>>0) & 0xFF; 
+        buff[12] = (onmax>>24) & 0xFF;        /*On最大时间 大端*/
+        buff[13] = (onmax>>16) & 0xFF; 
+        buff[14] = (onmax>>8) & 0xFF; 
+	buff[15] = (onmax>>0) & 0xFF; 
+        buff[16] = (offmin>>24) & 0xFF;        /*Off最小时间 大端*/
+        buff[17] = (offmin>>16) & 0xFF; 
+	buff[18] = (offmin>>8) & 0xFF; 
+	buff[19] = (offmin>>0) & 0xFF; 
+        buff[20] = (offmax>>24) & 0xFF;        /*Off最大时间 大端*/
+        buff[21] = (offmax>>16) & 0xFF; 
+	buff[22] = (offmax>>8) & 0xFF; 
+	buff[23] = (offmax>>0) & 0xFF; 
+	buff[24] = buff_sum(buff,24);
+        driver_uart_send(HAL_UART_4, buff, 25, 10, &erro);
+        
+}
+
+/**
+ *******************************************************************************
+ * \fn          int32_t pc_protocol_setswitch(uint8_t* buff)
+ * \brief       设置继电器参数.
+ * \note        
+ * \retval      0 成功
+ * \retval      其他值 失败
+ *******************************************************************************
+ */
+int32_t pc_protocol_setswitch(uint8_t* buff)
+{
+  uint32_t onmin,onmax,offmin,offmax;
+  onmin = ((uint32_t)buff[1]<<24)|((uint32_t)buff[2]<<16)|((uint32_t)buff[3]<<8)|((uint32_t)buff[4]<<0);
+  onmax = ((uint32_t)buff[5]<<24)|((uint32_t)buff[6]<<16)|((uint32_t)buff[7]<<8)|((uint32_t)buff[8]<<0);
+  offmin = ((uint32_t)buff[9]<<24)|((uint32_t)buff[10]<<16)|((uint32_t)buff[11]<<8)|((uint32_t)buff[12]<<0);
+  offmax = ((uint32_t)buff[13]<<24)|((uint32_t)buff[14]<<16)|((uint32_t)buff[15]<<8)|((uint32_t)buff[16]<<0);
+  switch_set_par(buff[0],onmin,onmax,offmin,offmax);
+  return 0;
+        
+}
 /**
  *******************************************************************************
  * \fn          uint32_t get_dev_state(void)

@@ -18,7 +18,7 @@
 #include "dev_magt.h"
 #include "driver_spi.h"
 #include "dev_ssoc.h"
-
+#include <stdlib.h>
 
 #define SPI_TEST 0
 
@@ -49,6 +49,8 @@ extern __IO uint8_t Tx_Idx2 , Rx_Idx2;
 extern unsigned  prvRxTask(void* params);
 extern int kiss_set(int argc); 
 
+#define SWITCH_UINT 5
+
 uint8_t buff_sum(void* buff,uint8_t len)
 {
   uint8_t sum=0;
@@ -68,6 +70,179 @@ uint8_t spi_wrbuff1[7]={0x1A,0xCF,0xFC,0x1D,0x04,0x01,0x05};  /*读太敏数据*/
 uint8_t spi_wrbuff2[7]={0x1A,0xCF,0xFC,0x1D,0x03,0x01,0x04};  /*滤波后电压*/
 uint8_t spi_wrbuff3[7]={0x1A,0xCF,0xFC,0x1D,0x01,0x01,0x02};  /*未滤波电压*/
 
+#define SWITCH_NUM 8
+
+#define SWITCH_MODE_ON  1
+#define SWITCH_MODE_OFF 0
+#define SWITCH_MODE_TOG 2
+
+
+#define SWITCH_TOG_INIT 0
+#define SWITCH_TOG_WAIT_ON 1
+#define SWITCH_TOG_WAIT_OFF 2
+
+uint8_t g_switch_state[8];  /*低4位主模式 高四位状态机*/
+uint32_t g_switch_srand[8][4];  /*ON最少时间 最长时间 OFF最短时间 最长时间*/
+uint32_t g_state_time[8];
+
+void switch_set_par(uint8_t ch,uint32_t onmin,uint32_t onmax,uint32_t offmin,uint32_t offmax)
+{
+  if(ch<8)
+  {
+    if((onmin==0) && (onmax==0))
+    {
+      g_switch_state[ch] &= 0xF0;
+      g_switch_state[ch] |= SWITCH_MODE_OFF;
+    }
+    else if((offmin==0) && (offmax==0))
+    {
+      g_switch_state[ch] &= 0xF0;
+      g_switch_state[ch] |= SWITCH_MODE_ON;
+    }
+    else
+    {
+      g_switch_state[ch] &= 0xF0;
+      g_switch_state[ch] |= SWITCH_MODE_TOG;
+    }
+    g_switch_srand[ch][0] = onmin;  
+    g_switch_srand[ch][1] = onmax;
+    g_switch_srand[ch][2] = offmin;  
+    g_switch_srand[ch][3] = offmax;
+  }
+}
+
+void switch_get_par(uint8_t ch,uint32_t* onmin,uint32_t* onmax,uint32_t* offmin,uint32_t* offmax)
+{
+  if(ch<8)
+  {
+    *onmin = g_switch_srand[ch][0];  
+    *onmax = g_switch_srand[ch][1]; 
+    *offmin = g_switch_srand[ch][2];  
+    *offmax = g_switch_srand[ch][3]; 
+  }
+}
+
+void switch_set_rand(uint8_t ch,uint8_t state,uint8_t* buff)
+{
+    g_switch_state[ch]=state;
+    memcpy(&g_switch_srand[ch],buff,sizeof(uint16_t)*4);
+}
+
+void switch_init(void)
+{
+    int i;
+    GPIO_InitTypeDef giocfg;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
+    GPIO_DeInit(GPIOE);
+    memset(g_state_time,0,sizeof(g_state_time));
+    for(i=0;i<8;i++)
+    {
+        g_switch_state[i]=SWITCH_MODE_TOG;
+        g_switch_srand[i][2]=5000;
+        g_switch_srand[i][3]=5000;
+        g_switch_srand[i][0]=24*60*60*1000;
+        g_switch_srand[i][1]=24*60*60*1000; 
+    }
+    /*IO初始化  PE0-PE7*/
+    giocfg.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1| GPIO_Pin_2| GPIO_Pin_3| GPIO_Pin_4| GPIO_Pin_5| GPIO_Pin_6| GPIO_Pin_7;
+    giocfg.GPIO_Speed = GPIO_Speed_10MHz;
+    giocfg.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_ResetBits(GPIOE,GPIO_Pin_0 | GPIO_Pin_1| GPIO_Pin_2| GPIO_Pin_3| GPIO_Pin_4| GPIO_Pin_5| GPIO_Pin_6| GPIO_Pin_7);
+    GPIO_Init(GPIOE, &giocfg);
+    
+}
+
+uint32_t app_get_onrand(uint8_t id)
+{
+   uint32_t val;
+   val=((uint32_t)rand())%(g_switch_srand[id][1]-g_switch_srand[id][0]+1)+g_switch_srand[id][0];
+   return val;
+}
+
+uint32_t app_get_offrand(uint8_t id)
+{
+   uint32_t val;
+   val=((uint32_t)rand())%(g_switch_srand[id][3]-g_switch_srand[id][2]+1)+g_switch_srand[id][2];
+   return val;
+}
+
+void switch_onoff(uint8_t ch,uint8_t state)
+{
+  if(state)
+  {
+    GPIO_ResetBits(GPIOE,1<<ch);
+  }
+  else
+  {
+    GPIO_SetBits(GPIOE,1<<ch);
+  }
+  
+}
+
+void switch_handle(void)
+{
+  int i;
+  for(i=0;i<8;i++)
+  {
+    switch(g_switch_state[i]&0x0F)
+    {
+    case SWITCH_MODE_ON:
+      switch_onoff(i,1);
+      //g_switch_state[i] &= 0x0F;
+      //g_switch_state[i] |= SWITCH_TOG_INIT<<4;
+      break;
+    case SWITCH_MODE_OFF:
+      switch_onoff(i,0);
+      break;
+    case SWITCH_MODE_TOG:
+      switch((g_switch_state[i]&0xF0)>>4)
+      {
+      case SWITCH_TOG_INIT:
+        switch_onoff(i,1);
+        g_state_time[i]=app_get_onrand(i);
+        g_switch_state[i] &= 0x0F;
+        g_switch_state[i] |= SWITCH_TOG_WAIT_OFF<<4;
+        break;
+      case SWITCH_TOG_WAIT_OFF:
+        if((g_state_time[i]>g_switch_srand[i][0]) && (g_state_time[i]>g_switch_srand[i][1]))
+        {
+          g_state_time[i]=app_get_onrand(i);
+        }
+        if(g_state_time[i]>SWITCH_UINT)
+        {
+            g_state_time[i] -= SWITCH_UINT;
+        }
+        else
+        {
+          switch_onoff(i,0);
+          g_state_time[i]=app_get_offrand(i);
+          g_switch_state[i] &= 0x0F;
+          g_switch_state[i] |= SWITCH_TOG_WAIT_ON<<4;
+        }
+        break;
+      case SWITCH_TOG_WAIT_ON:
+        if((g_state_time[i]>g_switch_srand[i][2]) && (g_state_time[i]>g_switch_srand[i][3]))
+        {
+          g_state_time[i]=app_get_offrand(i);
+        }
+        if(g_state_time[i]>SWITCH_UINT)
+        {
+            g_state_time[i]-=SWITCH_UINT;
+        }
+        else
+        {
+          switch_onoff(i,1);
+          g_state_time[i]=app_get_onrand(i);
+          g_switch_state[i] &= 0x0F;
+          g_switch_state[i] |= SWITCH_TOG_WAIT_OFF<<4;
+        }
+        break;
+      
+      }
+      break;
+    }
+  }
+}
 
 
 static void shelltask( void *pvParameters )
@@ -88,9 +263,9 @@ static void shelltask( void *pvParameters )
   printf("任务2启动\r\n");
   while(1)
   {
-    shell_exec_shellcmd();
-    OsTimeDelay(5);
-    
+    //shell_exec_shellcmd();
+    OsTimeDelay(SWITCH_UINT);
+#if 0
     if((driver_time_getruntime() - readtime) > 1)
     {
         readtime = driver_time_getruntime();
@@ -99,6 +274,9 @@ static void shelltask( void *pvParameters )
         printf("duty-my:%d\r\n",magtdata.my);
         printf("duty-mz:%d\r\n",magtdata.mz);
     }
+#endif  
+    switch_handle();
+    
 #if SPI_TEST
     driver_spi_trans(spi_wrbuff1,spi_rdbuff,sizeof(spi_wrbuff1));
     OsTimeDelay(10);
@@ -189,6 +367,8 @@ int main(void)
   GPIO_Init(GPIOB, &giocfg);
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
   SystemCoreClockUpdate();
+  
+  switch_init();
   
   csp_debug_hook_set(csp_debug_hook);
   driver_time_init();
